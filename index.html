@@ -1,0 +1,3137 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>GIRLY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --blush-50:  #fdf6f5;
+  --blush-100: #fbe9e7;
+  --blush-200: #f6d5d2;
+  --blush-300: #eebab5;
+  --rose-500:  #d97e8e;
+  --rose-600:  #c2657b;
+  --rose-700:  #a84f68;
+  --cream:     #f8f3ec;
+  --sand:      #e9ddc9;
+  --ink:       #2b2426;
+  --ink-soft:  #5c5257;
+  --ink-faint: #8c8286;
+  --white:     #ffffff;
+  --line:      #ecdedb;
+  --success:   #6f9c76;
+  --danger:    #c1544a;
+  --shadow-1: 0 1px 2px rgba(43,36,38,.04), 0 8px 24px -12px rgba(43,36,38,.10);
+  --shadow-2: 0 4px 16px rgba(43,36,38,.06), 0 20px 48px -20px rgba(43,36,38,.18);
+  --radius-s: 10px;
+  --radius-m: 16px;
+  --radius-l: 24px;
+  --radius-xl:32px;
+  --font-display: 'Fraunces', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --sidebar-w: 248px;
+  --header-h: 0px;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family:var(--font-body);
+  background:var(--cream);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;margin:0;color:var(--ink);letter-spacing:-.01em;}
+p{margin:0;}
+button{font-family:inherit;}
+img{max-width:100%;display:block;}
+::selection{background:var(--blush-300);color:var(--ink);}
+a{color:inherit;}
+
+/* focus visibility */
+:focus-visible{outline:2px solid var(--rose-600);outline-offset:2px;border-radius:6px;}
+
+/* scrollbar */
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--blush-300);border-radius:8px;}
+::-webkit-scrollbar-track{background:transparent;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+#app{display:flex;min-height:100vh;}
+
+/* ---- Sidebar (desktop) ---- */
+.sidebar{
+  width:var(--sidebar-w);
+  flex-shrink:0;
+  background:var(--white);
+  border-right:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  padding:28px 18px;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+.brand{
+  display:flex;align-items:center;gap:10px;
+  padding:4px 10px 28px 10px;
+}
+.brand-mark{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(155deg,var(--rose-500),var(--rose-700));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:var(--font-display);font-weight:600;font-size:17px;
+  flex-shrink:0;
+}
+.brand-name{font-family:var(--font-display);font-size:20px;font-weight:600;}
+.nav-group{display:flex;flex-direction:column;gap:2px;margin-top:6px;}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 14px;border-radius:12px;
+  color:var(--ink-soft);text-decoration:none;
+  font-size:14.5px;font-weight:500;
+  cursor:pointer;border:none;background:none;width:100%;text-align:left;
+  transition:background .15s ease,color .15s ease;
+}
+.nav-item svg{width:19px;height:19px;flex-shrink:0;opacity:.85;}
+.nav-item:hover{background:var(--blush-100);color:var(--ink);}
+.nav-item.active{background:var(--blush-200);color:var(--rose-700);font-weight:600;}
+.nav-item.active svg{opacity:1;}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);}
+.mini-profile{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;cursor:pointer;}
+.mini-profile:hover{background:var(--blush-100);}
+.mini-avatar{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--blush-200);color:var(--rose-700);
+  display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;
+  font-family:var(--font-display);
+  flex-shrink:0;
+}
+.mini-name{font-size:13.5px;font-weight:600;}
+.mini-sub{font-size:12px;color:var(--ink-faint);}
+
+/* ---- Main ---- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{
+  display:flex;align-items:center;gap:14px;
+  padding:20px 32px;
+  position:sticky;top:0;z-index:20;
+  background:rgba(248,243,236,.86);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid transparent;
+}
+.topbar.scrolled{border-bottom-color:var(--line);}
+.search-wrap{
+  flex:1;max-width:420px;
+  display:flex;align-items:center;gap:9px;
+  background:var(--white);border:1px solid var(--line);
+  border-radius:100px;padding:9px 16px;
+  color:var(--ink-faint);
+}
+.search-wrap svg{width:16px;height:16px;flex-shrink:0;}
+.search-wrap input{
+  border:none;outline:none;background:none;flex:1;
+  font-size:13.5px;color:var(--ink);font-family:inherit;
+}
+.topbar-right{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.icon-btn{
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--white);border:1px solid var(--line);
+  cursor:pointer;color:var(--ink-soft);
+  transition:background .15s ease,transform .1s ease;
+}
+.icon-btn:hover{background:var(--blush-100);}
+.icon-btn:active{transform:scale(.94);}
+.icon-btn svg{width:17px;height:17px;}
+
+.view{padding:8px 32px 100px 32px;max-width:1180px;}
+.view[hidden]{display:none;}
+
+/* ---- Bottom nav (mobile) ---- */
+.bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);
+  padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+  z-index:40;
+  justify-content:space-around;
+}
+.bn-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;color:var(--ink-faint);
+  font-size:10.5px;font-weight:600;padding:4px 8px;border-radius:10px;
+  flex:1;
+}
+.bn-item svg{width:21px;height:21px;}
+.bn-item.active{color:var(--rose-600);}
+
+/* ============================================================
+   GENERIC ELEMENTS
+   ============================================================ */
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:18px 0 26px 0;flex-wrap:wrap;}
+.page-title{font-size:30px;}
+.page-sub{color:var(--ink-faint);font-size:14px;margin-top:4px;}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 20px;border-radius:100px;border:none;cursor:pointer;
+  font-size:13.5px;font-weight:600;font-family:inherit;
+  transition:transform .1s ease,background .15s ease,box-shadow .15s ease;
+  white-space:nowrap;
+}
+.btn:active{transform:scale(.97);}
+.btn svg{width:16px;height:16px;}
+.btn-primary{background:var(--rose-600);color:#fff;box-shadow:0 6px 16px -6px rgba(194,101,123,.55);}
+.btn-primary:hover{background:var(--rose-700);}
+.btn-secondary{background:var(--white);color:var(--ink);border:1px solid var(--line);}
+.btn-secondary:hover{background:var(--blush-100);}
+.btn-ghost{background:none;color:var(--ink-soft);}
+.btn-ghost:hover{background:var(--blush-100);color:var(--ink);}
+.btn-danger{background:#fbeceb;color:var(--danger);}
+.btn-danger:hover{background:#f6dcda;}
+.btn-sm{padding:8px 14px;font-size:12.5px;}
+.btn-icon-only{padding:11px;border-radius:50%;}
+
+.fab{
+  position:fixed;right:28px;bottom:28px;z-index:35;
+  width:56px;height:56px;border-radius:50%;
+  background:var(--rose-600);color:#fff;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 24px -6px rgba(194,101,123,.6);
+  transition:transform .12s ease;
+}
+.fab:hover{background:var(--rose-700);}
+.fab:active{transform:scale(.92);}
+.fab svg{width:24px;height:24px;}
+
+.card{
+  background:var(--white);border:1px solid var(--line);
+  border-radius:var(--radius-l);padding:22px;
+  box-shadow:var(--shadow-1);
+}
+
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 13px;border-radius:100px;
+  background:var(--blush-100);color:var(--rose-700);
+  font-size:12px;font-weight:600;border:1px solid transparent;cursor:pointer;
+  white-space:nowrap;
+}
+.chip.active{background:var(--rose-600);color:#fff;}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.chip-neutral{background:var(--cream);color:var(--ink-soft);}
+
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:100px;font-size:10.5px;font-weight:700;letter-spacing:.02em;}
+.badge-success{background:#eaf3ea;color:var(--success);}
+.badge-danger{background:#faeae8;color:var(--danger);}
+.badge-neutral{background:var(--cream);color:var(--ink-faint);}
+
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:64px 24px;gap:14px;
+}
+.empty-icon{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--blush-100);display:flex;align-items:center;justify-content:center;
+  color:var(--rose-500);
+}
+.empty-icon svg{width:30px;height:30px;}
+.empty-title{font-family:var(--font-display);font-size:19px;font-weight:600;}
+.empty-sub{color:var(--ink-faint);font-size:13.5px;max-width:320px;line-height:1.5;}
+
+.skeleton{background:linear-gradient(100deg,var(--blush-100) 30%,var(--blush-50) 50%,var(--blush-100) 70%);background-size:220% 100%;animation:shimmer 1.3s ease infinite;border-radius:14px;}
+@keyframes shimmer{0%{background-position:120% 0;}100%{background-position:-20% 0;}}
+
+.section-title{font-size:17px;font-weight:600;font-family:var(--font-display);margin-bottom:14px;}
+
+/* ============================================================
+   MODAL + TOAST
+   ============================================================ */
+.overlay{
+  position:fixed;inset:0;background:rgba(43,36,38,.42);
+  backdrop-filter:blur(2px);
+  display:flex;align-items:flex-end;justify-content:center;
+  z-index:100;opacity:0;pointer-events:none;
+  transition:opacity .18s ease;
+}
+.overlay.open{opacity:1;pointer-events:auto;}
+@media(min-width:720px){.overlay{align-items:center;}}
+
+.modal{
+  background:var(--white);
+  width:100%;max-width:520px;
+  max-height:92vh;overflow-y:auto;
+  border-radius:26px 26px 0 0;
+  padding:26px 26px calc(26px + env(safe-area-inset-bottom));
+  transform:translateY(24px);
+  transition:transform .2s cubic-bezier(.2,.8,.2,1);
+}
+.overlay.open .modal{transform:translateY(0);}
+@media(min-width:720px){
+  .modal{border-radius:24px;}
+}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.modal-title{font-size:19px;}
+.modal-close{
+  width:32px;height:32px;border-radius:50%;border:none;background:var(--cream);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);
+}
+.modal-close svg{width:15px;height:15px;}
+.modal-foot{display:flex;gap:10px;margin-top:22px;}
+.modal-foot .btn{flex:1;}
+
+.field{margin-bottom:15px;}
+.field-label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;}
+.field input[type=text],.field input[type=number],.field input[type=date],.field input[type=url],.field input[type=password],.field select,.field textarea{
+  width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--line);
+  background:var(--cream);font-size:14px;font-family:inherit;color:var(--ink);
+  outline:none;transition:border-color .15s ease,background .15s ease;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--rose-500);background:var(--white);}
+.field textarea{resize:vertical;min-height:64px;}
+.field-row{display:flex;gap:10px;}
+.field-row .field{flex:1;}
+.seg{display:flex;background:var(--cream);border-radius:12px;padding:3px;gap:2px;}
+.seg button{flex:1;padding:9px;border:none;background:none;border-radius:10px;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;}
+.seg button.active{background:var(--white);color:var(--rose-700);box-shadow:var(--shadow-1);}
+.opt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;}
+.opt-btn{
+  padding:10px 8px;border-radius:12px;border:1px solid var(--line);background:var(--cream);
+  font-size:12px;font-weight:600;color:var(--ink-soft);cursor:pointer;text-align:center;
+}
+.opt-btn.active{background:var(--blush-200);border-color:var(--rose-400,#e3a1ac);color:var(--rose-700);}
+.color-dot-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--line);cursor:pointer;position:relative;}
+.color-dot-btn.active{border-color:var(--rose-600);}
+.color-dot-btn.active::after{content:'';position:absolute;inset:-5px;border:2px solid var(--rose-600);border-radius:50%;}
+
+.upload-box{
+  border:1.5px dashed var(--line);border-radius:16px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  padding:26px;cursor:pointer;color:var(--ink-faint);background:var(--cream);text-align:center;
+  position:relative;overflow:hidden;
+}
+.upload-box svg{width:24px;height:24px;}
+.upload-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.upload-box span{font-size:12.5px;font-weight:600;position:relative;}
+
+/* toasts */
+.toast-stack{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;width:100%;pointer-events:none;}
+@media (max-width:719px){.toast-stack{bottom:90px;}}
+.toast{
+  background:var(--ink);color:#fff;padding:12px 20px;border-radius:100px;
+  font-size:13px;font-weight:500;box-shadow:var(--shadow-2);
+  display:flex;align-items:center;gap:8px;
+  animation:toast-in .25s cubic-bezier(.2,.8,.2,1);
+  max-width:88vw;
+}
+.toast.toast-out{animation:toast-out .2s ease forwards;}
+@keyframes toast-in{from{opacity:0;transform:translateY(10px) scale(.96);}to{opacity:1;transform:none;}}
+@keyframes toast-out{to{opacity:0;transform:translateY(6px) scale(.96);}}
+.toast-dot{width:6px;height:6px;border-radius:50%;background:var(--rose-400,#e3a1ac);flex-shrink:0;}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:980px){
+  .sidebar{width:76px;padding:24px 12px;align-items:center;}
+  .brand-name,.nav-item span,.mini-name,.mini-sub{display:none;}
+  .nav-item{justify-content:center;padding:12px;}
+  .brand{justify-content:center;padding-bottom:24px;}
+  .mini-profile{justify-content:center;}
+}
+@media(max-width:719px){
+  .sidebar{display:none;}
+  .bottom-nav{display:flex;}
+  .view{padding:4px 16px 100px 16px;}
+  .topbar{padding:16px;}
+  .fab{right:18px;bottom:86px;}
+  .page-title{font-size:25px;}
+}
+
+/* ---- Dark theme override ---- */
+body.theme-dark{
+  --cream:#211c1e; --white:#2b2426; --ink:#f5eeee; --ink-soft:#cbbec0; --ink-faint:#8f8285;
+  --line:#3a3234; --blush-50:#2f2628; --blush-100:#3a2c2f; --blush-200:#4a3438; --blush-300:#5c3d43;
+  background:var(--cream);
+}
+body.theme-dark .search-wrap,body.theme-dark .field input,body.theme-dark .field select,body.theme-dark .field textarea{background:var(--blush-50);}
+body.theme-dark .topbar{background:rgba(33,28,30,.86);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast-stack" id="toastStack"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ================================================================
+   GIRLY — single file app
+   Sections: CONFIG, STATE, STORAGE, ICONS, UTIL, ROUTER, UI,
+   TOAST, MODALS, MONEY, WISHLIST, WARDROBE, WEATHER, OUTFIT ENGINE,
+   AI, SETTINGS, EXPORT/IMPORT, SEARCH, ONBOARDING, BOOT
+   ================================================================ */
+
+/* ============================ CONFIG ============================ */
+const APP_NAME_KEY = 'girly_app_name';
+const SUPABASE_CONFIG_KEY = 'girly_supabase_config';
+const CONFIG = {
+  supabaseUrl: '',
+  supabaseKey: '',
+  weatherProvider: 'open-meteo',
+  weatherApiKey: '',
+  aiProvider: 'gemini',
+  aiEnabled: false,
+  aiApiKey: '',
+  weatherCacheMinutes: 45
+};
+
+function loadSupabaseConfig(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(SUPABASE_CONFIG_KEY) || 'null');
+    if(saved && typeof saved === 'object'){
+      CONFIG.supabaseUrl = saved.url || '';
+      CONFIG.supabaseKey = saved.key || '';
+    }
+  }catch(e){ console.error('Supabase config load error', e); }
+}
+function saveSupabaseConfig(url, key){
+  CONFIG.supabaseUrl = String(url || '').trim().replace(/\/$/, '');
+  CONFIG.supabaseKey = String(key || '').trim();
+  localStorage.setItem(SUPABASE_CONFIG_KEY, JSON.stringify({url:CONFIG.supabaseUrl,key:CONFIG.supabaseKey}));
+}
+function supabaseConfigIsValid(){
+  return /^https:\/\/.+/.test(CONFIG.supabaseUrl) && !!CONFIG.supabaseKey;
+}
+
+loadSupabaseConfig();
+const { createClient } = window.supabase || {};
+let supabaseClient = null;
+function rebuildSupabaseClient(){
+  if(!createClient || !supabaseConfigIsValid()){ supabaseClient = null; return null; }
+  supabaseClient = createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+  });
+  return supabaseClient;
+}
+rebuildSupabaseClient();
+
+let saveQueue = Promise.resolve();
+let realtimeChannel = null;
+let realtimeReloadTimer = null;
+let remoteReady = false;
+
+function getAppName(){ return STATE.settings?.appName || localStorage.getItem(APP_NAME_KEY) || 'GIRLY'; }
+function setAppName(name){
+  STATE.settings = STATE.settings || defaultSettings();
+  STATE.settings.appName = name || 'GIRLY';
+  localStorage.setItem(APP_NAME_KEY, STATE.settings.appName);
+  return saveSettings();
+}
+
+/* ============================ STATE ============================ */
+let STATE = {
+  route: 'home',
+  profile: null,
+  money: null,
+  wishlist: [],
+  wardrobe: [],
+  outfits: [],
+  settings: null,
+  weatherCache: null,
+  wishlistView: 'list',
+  wishlistFilter: 'all',
+  wishlistSearch: '',
+  wishlistCategory: 'all',
+  wardrobeFilter: 'all',
+  wardrobeSearch: '',
+  moneyHistoryFilter: 'all',
+  outfitDraft: null,
+  outfitCandidates: [],
+  outfitSelectedIndex: 0,
+  imageCache: {}
+};
+
+function defaultSettings(){
+  return {
+    theme: 'light',
+    weatherCity: 'Milano',
+    weatherLat: 45.4642,
+    weatherLon: 9.19,
+    useGeolocation: false,
+    weatherDisabled: false,
+    aiEnabled: false,
+    aiProvider: 'gemini',
+    aiApiKey: '',
+    aiModel: 'gemini-1.5-flash',
+    appName: 'GIRLY'
+  };
+}
+
+function emptyState(){
+  return {
+    profile: null,
+    money: { id: null, total: 0, unallocated: 0, categories: [], transactions: [] },
+    wishlist: [],
+    wardrobe: [],
+    outfits: [],
+    settings: defaultSettings(),
+    weatherCache: null,
+    todayOutfit: null
+  };
+}
+
+function normalizeLoadedData(row){
+  const base = emptyState();
+  const d = row?.data && typeof row.data === 'object' ? row.data : {};
+  STATE.profile = d.profile || base.profile;
+  STATE.money = d.money || base.money;
+  STATE.wishlist = Array.isArray(d.wishlist) ? d.wishlist : [];
+  STATE.wardrobe = Array.isArray(d.wardrobe) ? d.wardrobe : [];
+  STATE.outfits = Array.isArray(d.outfits) ? d.outfits : [];
+  STATE.settings = { ...base.settings, ...(d.settings || {}) };
+  STATE.weatherCache = d.weatherCache || null;
+  STATE.todayOutfit = d.todayOutfit || null;
+  // Compatibilità: elimina eventuali record demo già eventualmente presenti nel payload.
+  STATE.wishlist = STATE.wishlist.filter(i => !i?.isDemo);
+  STATE.wardrobe = STATE.wardrobe.filter(i => !i?.isDemo);
+  if(!STATE.money || typeof STATE.money !== 'object') STATE.money = base.money;
+  STATE.money.categories = Array.isArray(STATE.money.categories) ? STATE.money.categories : [];
+  STATE.money.transactions = Array.isArray(STATE.money.transactions) ? STATE.money.transactions : [];
+}
+
+function buildPersistedPayload(){
+  return {
+    profile: STATE.profile,
+    money: STATE.money,
+    wishlist: STATE.wishlist,
+    wardrobe: STATE.wardrobe,
+    outfits: STATE.outfits,
+    settings: STATE.settings,
+    weatherCache: STATE.weatherCache,
+    todayOutfit: STATE.todayOutfit || null
+  };
+}
+
+async function testSupabaseConnection(){
+  if(!supabaseConfigIsValid()) throw new Error('Inserisci URL e publishable/anon key di Supabase.');
+  rebuildSupabaseClient();
+  const { error } = await supabaseClient.from('girly_app_data').select('id').eq('id', 1).maybeSingle();
+  if(error) throw error;
+  return true;
+}
+
+async function loadAllData(){
+  if(!supabaseClient) throw new Error('SUPABASE_NOT_CONFIGURED');
+  const { data, error } = await supabaseClient
+    .from('girly_app_data')
+    .select('id,data,updated_at')
+    .eq('id', 1)
+    .maybeSingle();
+  if(error) throw error;
+  normalizeLoadedData(data);
+  remoteReady = true;
+  return STATE;
+}
+
+function queueStateSave(context='save'){
+  if(!supabaseClient) return Promise.reject(new Error('Supabase non configurato. Vai in Impostazioni → Database.'));
+  const payload = JSON.parse(JSON.stringify(buildPersistedPayload()));
+  saveQueue = saveQueue.then(async ()=>{
+    const { error } = await supabaseClient
+      .from('girly_app_data')
+      .upsert({ id: 1, data: payload, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+    if(error) throw error;
+    remoteReady = true;
+  }).catch(err=>{
+    console.error(`Supabase ${context} error`, err);
+    toast(`Salvataggio non riuscito: ${err.message || 'errore Supabase'}`);
+    throw err;
+  });
+  return saveQueue;
+}
+
+function saveProfile(){ return queueStateSave('profilo'); }
+function saveMoney(){ return queueStateSave('money'); }
+function saveWishlist(){ return queueStateSave('wishlist'); }
+function saveWardrobe(){ return queueStateSave('armadio'); }
+function saveOutfits(){ return queueStateSave('outfit'); }
+function saveSettings(){ return queueStateSave('impostazioni'); }
+function saveWeatherCache(){ return queueStateSave('meteo'); }
+
+async function clearRemoteUserData(){
+  if(!supabaseClient) throw new Error('Supabase non configurato.');
+  const { error } = await supabaseClient.from('girly_app_data').delete().eq('id', 1);
+  if(error) throw error;
+  remoteReady = false;
+}
+
+function subscribeToRealtime(){
+  if(!supabaseClient) return;
+  if(realtimeChannel) { try{ supabaseClient.removeChannel(realtimeChannel); }catch(e){} }
+  realtimeChannel = supabaseClient.channel('girly-shared-data')
+    .on('postgres_changes', { event:'*', schema:'public', table:'girly_app_data' }, ()=>{
+      clearTimeout(realtimeReloadTimer);
+      realtimeReloadTimer = setTimeout(async ()=>{
+        try{
+          await loadAllData();
+          if(document.getElementById('viewRoot')) { renderShell(); renderView(); applyTheme(); }
+        }catch(e){ console.error('Realtime reload error', e); }
+      }, 250);
+    })
+    .subscribe();
+}
+
+/* Le immagini vengono memorizzate nel payload Supabase come data URL compresso.
+   In questo progetto l'uso è volutamente semplice e senza una seconda infrastruttura. */
+async function resolveItemImage(item){
+  return item?.imageData || item?.image || null;
+}
+function compressImageFile(file, maxDim=900, quality=0.82){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let { width, height } = img;
+        if(width > height && width > maxDim){ height = Math.round(height*(maxDim/width)); width = maxDim; }
+        else if(height > maxDim){ width = Math.round(width*(maxDim/height)); height = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,width,height);
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ============================ UTILITIES ============================ */
+function uid(prefix='id'){ return prefix + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
+function euro(n){
+  const v = Number(n)||0;
+  return v.toLocaleString('it-IT', { style:'currency', currency:'EUR', minimumFractionDigits:2, maximumFractionDigits:2 });
+}
+function fmtDate(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('it-IT', { day:'numeric', month:'short', year:'numeric' });
+}
+function fmtDateShort(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('it-IT', { day:'numeric', month:'short' });
+}
+function todayISO(){ return new Date().toISOString(); }
+function escapeHtml(str){
+  return String(str==null?'':str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function debounce(fn, ms){
+  let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); };
+}
+function el(html){
+  const t = document.createElement('template');
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+function on(root, selector, event, handler){
+  root.addEventListener(event, (e)=>{
+    const target = e.target.closest(selector);
+    if(target && root.contains(target)) handler(e, target);
+  });
+}
+
+/* ============================ ICONS (inline SVG, stroke) ============================ */
+const ICONS = {
+  home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/><path d="M9.5 20v-6h5v6"/></svg>`,
+  money: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="13" rx="2.5"/><circle cx="12" cy="12.5" r="3"/><path d="M6 6V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v9"/></svg>`,
+  wishlist: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.7 7.6 2.4 4 5.9 3.4 8.3 3 10.4 4.2 12 6.5c1.6-2.3 3.7-3.5 6.1-3.1 3.5.6 5.2 4.2 3.7 7.8-2.3 4.7-9.8 9.3-9.8 9.3Z"/></svg>`,
+  wardrobe: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 5 6.5V21h14V6.5L12 2Z"/><path d="M12 2v7"/><path d="M5 12h14"/><path d="M9 21v-6h6v6"/></svg>`,
+  outfits: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 4 6.5l1.5 3L8 8.2V20h8V8.2l2.5 1.3 1.5-3L16 4l-2 2h-4l-2-2Z"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.9 2.9l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.9-2.9l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1h-.2a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.9-2.9l.1.1a1.7 1.7 0 0 0 1.9.3H10a1.7 1.7 0 0 0 1-1.6v-.2a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.9 2.9l-.1.1a1.7 1.7 0 0 0-.3 1.9V10a1.7 1.7 0 0 0 1.6 1h.2a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1Z"/></svg>`,
+  plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,
+  close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>`,
+  heart: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.7 7.6 2.4 4 5.9 3.4 8.3 3 10.4 4.2 12 6.5c1.6-2.3 3.7-3.5 6.1-3.1 3.5.6 5.2 4.2 3.7 7.8-2.3 4.7-9.8 9.3-9.8 9.3Z"/></svg>`,
+  heartFill: `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.7 7.6 2.4 4 5.9 3.4 8.3 3 10.4 4.2 12 6.5c1.6-2.3 3.7-3.5 6.1-3.1 3.5.6 5.2 4.2 3.7 7.8-2.3 4.7-9.8 9.3-9.8 9.3Z"/></svg>`,
+  edit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>`,
+  more: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>`,
+  arrowRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
+  chevRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>`,
+  chevDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
+  shuffle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m18 4 3 3-3 3"/><path d="M3 7h5.5a5 5 0 0 1 4 2l3 4a5 5 0 0 0 4 2H21"/><path d="m18 20 3-3-3-3"/><path d="M3 17h5.5a5 5 0 0 0 4-2"/></svg>`,
+  camera: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2.5h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.5"/></svg>`,
+  sun: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2.5 12h2M19.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>`,
+  cloud: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .4-8 5.5 5.5 0 0 0-10.6 1.6A3.8 3.8 0 0 0 7 18Z"/></svg>`,
+  rain: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h9a4 4 0 0 0 .4-8 5.5 5.5 0 0 0-10.6 1.6A3.8 3.8 0 0 0 7 15Z"/><path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2"/></svg>`,
+  wallet: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2V9"/><path d="M3 7.5V17a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-4a2.2 2.2 0 0 0 0 4.4 2.2 2.2 0 0 0 0-4.4"/></svg>`,
+  folder: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z"/></svg>`,
+  gift: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/><path d="M12 8c-1.5 0-4-1-4-3a2.2 2.2 0 0 1 4-1c0-1.5-2.2-3.5-4-1M12 8c1.5 0 4-1 4-3a2.2 2.2 0 0 0-4-1c0-1.5 2.2-3.5 4-1"/></svg>`,
+  plane: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 21 12 16l7-5-2.5-2.5-8 3-3.5-2L3 11l3.5 1.5L4 15l1.5 1.5L8 15l1.5 3.5Z"/></svg>`,
+  tag: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3h6a2 2 0 0 1 2 2v6l-9.5 9.5a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L12 3Z"/><circle cx="15.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>`,
+  image: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5.5-5.5a2 2 0 0 0-2.8 0L4 19"/></svg>`,
+  sparkle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v5M12 16v5M3 12h5M16 12h5M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></svg>`,
+  swap: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v13M7 17l-3-3M7 17l3-3"/><path d="M17 20V7M17 7l-3 3M17 7l3 3"/></svg>`,
+  download: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m6.5 11 5.5 5.5L17.5 11"/><path d="M4 20h16"/></svg>`,
+  upload: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V7"/><path d="m6.5 12 5.5-5.5L17.5 12"/><path d="M4 20h16"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>`,
+  info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 8v.01"/></svg>`,
+};
+function icon(name, cls=''){ return `<span class="ico ${cls}">${ICONS[name]||''}</span>`; }
+
+/* ============================ TOAST ============================ */
+function toast(message){
+  const stack = document.getElementById('toastStack');
+  const node = el(`<div class="toast"><span class="toast-dot"></span><span>${escapeHtml(message)}</span></div>`);
+  stack.appendChild(node);
+  setTimeout(()=>{
+    node.classList.add('toast-out');
+    setTimeout(()=>node.remove(), 220);
+  }, 2600);
+}
+
+/* ============================ MODAL SYSTEM ============================ */
+function openModal(innerHtml, { onMount, size } = {}){
+  closeModal(); // ensure single modal
+  const overlay = el(`<div class="overlay" id="activeOverlay"><div class="modal" role="dialog" aria-modal="true">${innerHtml}</div></div>`);
+  document.body.appendChild(overlay);
+  requestAnimationFrame(()=>overlay.classList.add('open'));
+  overlay.addEventListener('mousedown', (e)=>{ if(e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', escCloseHandler);
+  if(onMount) onMount(overlay);
+  return overlay;
+}
+function escCloseHandler(e){ if(e.key === 'Escape') closeModal(); }
+function closeModal(){
+  const overlay = document.getElementById('activeOverlay');
+  if(!overlay) return;
+  overlay.classList.remove('open');
+  document.removeEventListener('keydown', escCloseHandler);
+  setTimeout(()=>overlay.remove(), 180);
+}
+function modalHead(title){
+  return `<div class="modal-head"><h3 class="modal-title">${escapeHtml(title)}</h3><button class="modal-close" onclick="closeModal()">${ICONS.close}</button></div>`;
+}
+function confirmDialog(title, message, onConfirm, confirmLabel='Elimina'){
+  openModal(`
+    ${modalHead(title)}
+    <p style="font-size:14px;color:var(--ink-soft);line-height:1.55;">${escapeHtml(message)}</p>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-danger" id="confirmBtn">${escapeHtml(confirmLabel)}</button>
+    </div>
+  `, { onMount:(overlay)=>{
+    overlay.querySelector('#confirmBtn').addEventListener('click', ()=>{ onConfirm(); closeModal(); });
+  }});
+}
+
+/* ============================ ROUTER ============================ */
+const ROUTES = [
+  { id:'home', label:'Home', icon:'home' },
+  { id:'money', label:'Money', icon:'money' },
+  { id:'wishlist', label:'Wishlist', icon:'wishlist' },
+  { id:'wardrobe', label:'Armadio', icon:'wardrobe' },
+  { id:'outfits', label:'Outfit salvati', icon:'outfits' },
+  { id:'settings', label:'Impostazioni', icon:'settings' },
+];
+const BOTTOM_ROUTES = ['home','money','wishlist','wardrobe'];
+
+function navigate(routeId){
+  STATE.route = routeId;
+  renderShellActive();
+  renderView();
+  window.scrollTo({ top:0, behavior:'auto' });
+}
+
+/* ============================ SHELL ============================ */
+function renderShell(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">${getAppName().slice(0,1).toUpperCase()}</div>
+        <div class="brand-name">${escapeHtml(getAppName())}</div>
+      </div>
+      <nav class="nav-group" id="navGroup">
+        ${ROUTES.map(r=>`
+          <button class="nav-item" data-route="${r.id}">
+            ${ICONS[r.icon]}<span>${r.label}</span>
+          </button>`).join('')}
+      </nav>
+      <div class="sidebar-foot">
+        <div class="mini-profile" data-route="settings">
+          <div class="mini-avatar">${(STATE.profile?.name||'?').slice(0,1).toUpperCase()}</div>
+          <div>
+            <div class="mini-name">${escapeHtml(STATE.profile?.name || 'Ospite')}</div>
+            <div class="mini-sub">${escapeHtml(STATE.profile?.city || '')}</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <div class="main">
+      <div class="topbar" id="topbar">
+        <div class="search-wrap">
+          ${ICONS.search}
+          <input type="text" id="globalSearch" placeholder="Cerca ovunque..." autocomplete="off">
+        </div>
+        <div class="topbar-right">
+          <button class="icon-btn" id="themeToggle" title="Tema" aria-label="Cambia tema">${ICONS.sun}</button>
+        </div>
+      </div>
+      <main class="view" id="viewRoot"></main>
+    </div>
+    <nav class="bottom-nav" id="bottomNav">
+      ${BOTTOM_ROUTES.map(id=>{
+        const r = ROUTES.find(x=>x.id===id);
+        return `<button class="bn-item" data-route="${id}">${ICONS[r.icon]}<span>${r.label}</span></button>`;
+      }).join('')}
+    </nav>
+  `;
+  document.querySelectorAll('[data-route]').forEach(node=>{
+    node.addEventListener('click', ()=>navigate(node.getAttribute('data-route')));
+  });
+  document.getElementById('globalSearch').addEventListener('input', debounce((e)=>{
+    handleGlobalSearch(e.target.value);
+  }, 220));
+  const mainScroller = document.querySelector('.main');
+  window.addEventListener('scroll', ()=>{
+    document.getElementById('topbar')?.classList.toggle('scrolled', window.scrollY > 4);
+  });
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+  renderShellActive();
+}
+function renderShellActive(){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.getAttribute('data-route')===STATE.route));
+  document.querySelectorAll('.bn-item').forEach(n=>n.classList.toggle('active', n.getAttribute('data-route')===STATE.route));
+}
+function toggleTheme(){
+  STATE.settings.theme = STATE.settings.theme === 'dark' ? 'light' : 'dark';
+  saveSettings();
+  applyTheme();
+  toast(STATE.settings.theme === 'dark' ? 'Tema scuro attivato' : 'Tema chiaro attivato');
+}
+function applyTheme(){
+  document.body.classList.toggle('theme-dark', STATE.settings?.theme === 'dark');
+  const btn = document.getElementById('themeToggle');
+  if(btn) btn.innerHTML = STATE.settings?.theme === 'dark' ? ICONS.sun : ICONS.cloud;
+}
+
+function renderView(){
+  const root = document.getElementById('viewRoot');
+  const renderers = {
+    home: renderHome,
+    money: renderMoney,
+    wishlist: renderWishlist,
+    wardrobe: renderWardrobe,
+    outfits: renderSavedOutfits,
+    settings: renderSettings
+  };
+  root.innerHTML = '';
+  const fn = renderers[STATE.route] || renderHome;
+  fn(root);
+  mountFab();
+}
+
+function mountFab(){
+  const old = document.getElementById('fab');
+  if(old) old.remove();
+  const map = {
+    money: { onClick: openAddTransactionModal, label:'Aggiungi movimento' },
+    wishlist: { onClick: openWishlistItemModal, label:'Aggiungi desiderio' },
+    wardrobe: { onClick: openWardrobeItemModal, label:'Aggiungi capo' },
+  };
+  const cfg = map[STATE.route];
+  if(!cfg) return;
+  const fab = el(`<button class="fab" id="fab" aria-label="${cfg.label}">${ICONS.plus}</button>`);
+  fab.addEventListener('click', ()=>cfg.onClick());
+  document.body.appendChild(fab);
+}
+
+/* ============================ MONEY ============================ */
+const FOLDER_ICONS = ['wallet','folder','gift','plane','tag','heart','sparkle','wishlist'];
+const FOLDER_COLORS = ['#d97e8e','#c99b6a','#8aab8f','#7fa8c9','#b98cc9','#c2657b','#a8825e','#6fb0a6'];
+
+function ensureMoney(){
+  if(!STATE.money){
+    STATE.money = { total:0, unallocated:0, categories:[], transactions:[] };
+    saveMoney();
+  }
+}
+function moneyUnallocated(){ return STATE.money.unallocated; }
+function moneyCategoryById(id){ return STATE.money.categories.find(c=>c.id===id); }
+function recalcTotal(){
+  const allocated = STATE.money.categories.reduce((s,c)=>s + c.amount, 0);
+  STATE.money.total = allocated + STATE.money.unallocated;
+}
+
+function renderMoney(root){
+  ensureMoney();
+  const m = STATE.money;
+  const hasData = m.categories.length > 0 || m.total > 0 || m.transactions.length > 0;
+
+  root.innerHTML = `
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Money</h1>
+        <p class="page-sub">Gestisci i tuoi soldi, in cartelle chiare.</p>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="btnAddBalance">${ICONS.plus} Aggiungi saldo</button>
+    </div>
+
+    ${!hasData ? `
+      <div class="card empty-state">
+        <div class="empty-icon">${ICONS.wallet}</div>
+        <div class="empty-title">Inizia aggiungendo il tuo saldo</div>
+        <p class="empty-sub">Registra quanto hai disponibile e crea le tue prime cartelle per organizzarlo.</p>
+        <button class="btn btn-primary" id="emptyAddBalance">${ICONS.plus} Aggiungi soldi</button>
+      </div>
+    ` : `
+      <div class="card" style="text-align:center;padding:38px 22px;margin-bottom:22px;background:linear-gradient(165deg,#fff,var(--blush-50));">
+        <p style="font-size:12.5px;font-weight:700;letter-spacing:.03em;color:var(--rose-600);">TOTALE DISPONIBILE</p>
+        <div style="font-family:var(--font-display);font-size:52px;font-weight:600;margin-top:6px;line-height:1;">${euro(m.total)}</div>
+        <div style="display:flex;justify-content:center;gap:22px;margin-top:18px;color:var(--ink-faint);font-size:12.5px;flex-wrap:wrap;">
+          <span><strong style="color:var(--ink);">${m.categories.length}</strong> cartelle</span>
+          <span><strong style="color:var(--ink);">${euro(m.unallocated)}</strong> non assegnati</span>
+          <span><strong style="color:var(--ink);">${m.transactions.length}</strong> movimenti</span>
+        </div>
+      </div>
+
+      <div class="section-title">Cartelle</div>
+      <div class="money-grid" id="foldersGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-bottom:30px;">
+        ${m.categories.map(c=>folderCardHtml(c)).join('')}
+        <button class="card" id="addFolderCard" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-style:dashed;cursor:pointer;color:var(--ink-faint);min-height:118px;background:transparent;">
+          ${ICONS.plus}<span style="font-size:12.5px;font-weight:600;">Nuova cartella</span>
+        </button>
+      </div>
+
+      ${renderMoneyCharts(m)}
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:30px 0 14px 0;">
+        <div class="section-title" style="margin-bottom:0;">Storico movimenti</div>
+      </div>
+      <div class="chip-row" id="historyFilters">
+        ${chipBtn('all', STATE.moneyHistoryFilter, 'Tutti')}
+        ${chipBtn('income', STATE.moneyHistoryFilter, 'Entrate')}
+        ${chipBtn('expense', STATE.moneyHistoryFilter, 'Uscite')}
+        ${chipBtn('transfer', STATE.moneyHistoryFilter, 'Trasferimenti')}
+      </div>
+      <div class="card" style="padding:6px;">
+        ${renderTransactionList(m)}
+      </div>
+    `}
+  `;
+
+  document.getElementById('btnAddBalance')?.addEventListener('click', openAddBalanceModal);
+  document.getElementById('emptyAddBalance')?.addEventListener('click', openAddBalanceModal);
+  document.getElementById('addFolderCard')?.addEventListener('click', ()=>openFolderModal());
+  root.querySelectorAll('.folder-card').forEach(card=>{
+    card.addEventListener('click', (e)=>{
+      if(e.target.closest('.folder-menu-btn')) return;
+      openFolderDetail(card.getAttribute('data-id'));
+    });
+  });
+  root.querySelectorAll('#historyFilters .chip').forEach(c=>{
+    c.addEventListener('click', ()=>{ STATE.moneyHistoryFilter = c.getAttribute('data-value'); renderView(); });
+  });
+}
+
+function chipBtn(value, current, label){
+  return `<button class="chip ${value===current?'active':''}" data-value="${value}">${escapeHtml(label)}</button>`;
+}
+
+function folderCardHtml(c){
+  return `
+  <div class="card folder-card" data-id="${c.id}" style="cursor:pointer;padding:18px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="width:38px;height:38px;border-radius:12px;background:${c.color}22;color:${c.color};display:flex;align-items:center;justify-content:center;">${ICONS[c.icon]||ICONS.folder}</div>
+    </div>
+    <div style="margin-top:14px;font-size:13.5px;font-weight:600;color:var(--ink-soft);">${escapeHtml(c.name)}</div>
+    <div style="font-family:var(--font-display);font-size:21px;font-weight:600;margin-top:2px;">${euro(c.amount)}</div>
+  </div>`;
+}
+
+function renderTransactionList(m){
+  let txs = [...m.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(STATE.moneyHistoryFilter !== 'all') txs = txs.filter(t=>t.type===STATE.moneyHistoryFilter);
+  if(txs.length === 0) return `<div class="empty-state" style="padding:40px 20px;"><div class="empty-icon">${ICONS.money}</div><div class="empty-title" style="font-size:15px;">Nessun movimento</div><p class="empty-sub">I movimenti che aggiungi appariranno qui.</p></div>`;
+  return txs.map(t=>{
+    const cat = moneyCategoryById(t.categoryId);
+    const sign = t.type === 'expense' ? '-' : t.type === 'income' ? '+' : '';
+    const color = t.type === 'expense' ? 'var(--danger)' : t.type === 'income' ? 'var(--success)' : 'var(--ink)';
+    const typeLabel = { income:'Entrata', expense:'Uscita', transfer:'Trasferimento' }[t.type];
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:13px 12px;border-bottom:1px solid var(--line);">
+      <div style="width:38px;height:38px;border-radius:11px;background:var(--blush-100);color:var(--rose-600);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICONS[cat?.icon]||ICONS.money}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13.5px;font-weight:600;">${escapeHtml(t.description || typeLabel)}</div>
+        <div style="font-size:11.5px;color:var(--ink-faint);">${cat ? escapeHtml(cat.name)+' · ' : ''}${fmtDate(t.date)}</div>
+      </div>
+      <div style="font-weight:700;font-size:14px;color:${color};white-space:nowrap;">${sign}${euro(Math.abs(t.amount))}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMoneyCharts(m){
+  if(m.categories.length === 0) return '';
+  const total = m.categories.reduce((s,c)=>s+c.amount,0) || 1;
+  let cumulative = 0;
+  const stops = m.categories.map(c=>{
+    const start = (cumulative/total)*360;
+    cumulative += c.amount;
+    const end = (cumulative/total)*360;
+    return `${c.color} ${start}deg ${end}deg`;
+  }).join(', ');
+  const income = m.transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const expense = m.transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const maxIE = Math.max(income, expense, 1);
+  return `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px;" class="money-charts-grid">
+    <div class="card">
+      <div class="section-title">Distribuzione per categoria</div>
+      <div style="display:flex;align-items:center;gap:22px;">
+        <div style="width:110px;height:110px;border-radius:50%;background:conic-gradient(${stops});flex-shrink:0;"></div>
+        <div style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+          ${m.categories.slice(0,5).map(c=>`
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft);">
+              <span style="width:9px;height:9px;border-radius:3px;background:${c.color};flex-shrink:0;"></span>
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(c.name)}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Entrate / Uscite</div>
+      <div style="display:flex;align-items:flex-end;gap:26px;height:110px;padding:0 8px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;">
+          <div style="width:100%;max-width:52px;background:var(--success);border-radius:8px 8px 3px 3px;height:${Math.max(6,(income/maxIE)*90)}px;"></div>
+          <span style="font-size:11px;color:var(--ink-faint);">Entrate</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;">
+          <div style="width:100%;max-width:52px;background:var(--danger);border-radius:8px 8px 3px 3px;height:${Math.max(6,(expense/maxIE)*90)}px;"></div>
+          <span style="font-size:11px;color:var(--ink-faint);">Uscite</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <style>@media(max-width:640px){.money-charts-grid{grid-template-columns:1fr !important;}}</style>
+  `;
+}
+
+function openAddBalanceModal(){
+  ensureMoney();
+  openModal(`
+    ${modalHead('Aggiungi saldo')}
+    <p style="font-size:13px;color:var(--ink-faint);margin-bottom:16px;line-height:1.5;">Questo importo va ad aumentare il totale disponibile ed entra nei "Non assegnati", finché non lo sposti in una cartella.</p>
+    <div class="field">
+      <label class="field-label">Importo</label>
+      <input type="number" id="balanceAmount" placeholder="0,00" step="0.01" min="0">
+    </div>
+    <div class="field">
+      <label class="field-label">Descrizione (opzionale)</label>
+      <input type="text" id="balanceDesc" placeholder="Es. Stipendio, regalo...">
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-primary" id="confirmBalance">${ICONS.check} Aggiungi</button>
+    </div>
+  `, { onMount:(overlay)=>{
+    overlay.querySelector('#balanceAmount').focus();
+    overlay.querySelector('#confirmBalance').addEventListener('click', ()=>{
+      const amount = parseFloat(overlay.querySelector('#balanceAmount').value);
+      const desc = overlay.querySelector('#balanceDesc').value.trim();
+      if(!amount || amount <= 0){ toast('Inserisci un importo valido'); return; }
+      STATE.money.unallocated += amount;
+      recalcTotal();
+      STATE.money.transactions.push({ id:uid('tx'), type:'income', amount, categoryId:null, description: desc || 'Saldo aggiunto', date: todayISO() });
+      saveMoney();
+      closeModal();
+      toast(`${euro(amount)} aggiunti al totale ✨`);
+      renderView();
+    });
+  }});
+}
+
+function openFolderModal(existing){
+  const isEdit = !!existing;
+  let selIcon = existing?.icon || FOLDER_ICONS[0];
+  let selColor = existing?.color || FOLDER_COLORS[0];
+  openModal(`
+    ${modalHead(isEdit ? 'Modifica cartella' : 'Nuova cartella')}
+    <div class="field">
+      <label class="field-label">Nome</label>
+      <input type="text" id="folderName" placeholder="Es. Vinted, Vacanze, Regali..." value="${escapeHtml(existing?.name||'')}">
+    </div>
+    <div class="field">
+      <label class="field-label">Descrizione (opzionale)</label>
+      <input type="text" id="folderDesc" value="${escapeHtml(existing?.description||'')}" placeholder="A cosa serve questa cartella">
+    </div>
+    <div class="field">
+      <label class="field-label">Icona</label>
+      <div class="opt-grid" id="folderIcons">
+        ${FOLDER_ICONS.map(i=>`<button type="button" class="opt-btn icon-opt" data-v="${i}" style="display:flex;align-items:center;justify-content:center;padding:12px;">${ICONS[i]}</button>`).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Colore</label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;" id="folderColors">
+        ${FOLDER_COLORS.map(c=>`<button type="button" class="color-dot-btn" data-v="${c}" style="background:${c};"></button>`).join('')}
+      </div>
+    </div>
+    ${!isEdit ? `<div class="field">
+      <label class="field-label">Importo iniziale (opzionale)</label>
+      <input type="number" id="folderInitial" placeholder="0,00" step="0.01" min="0">
+      <p style="font-size:11.5px;color:var(--ink-faint);margin-top:6px;">Sposta questo importo dai "Non assegnati" (${euro(moneyUnallocated())} disponibili).</p>
+    </div>` : ''}
+    <div class="modal-foot">
+      ${isEdit ? `<button class="btn btn-danger" id="deleteFolderBtn">${ICONS.trash}</button>` : ''}
+      <button class="btn btn-secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-primary" id="saveFolderBtn">${ICONS.check} Salva</button>
+    </div>
+  `, { onMount:(overlay)=>{
+    const iconBtns = overlay.querySelectorAll('.icon-opt');
+    const colorBtns = overlay.querySelectorAll('.color-dot-btn');
+    const syncIcons = ()=>iconBtns.forEach(b=>b.classList.toggle('active', b.getAttribute('data-v')===selIcon));
+    const syncColors = ()=>colorBtns.forEach(b=>b.classList.toggle('active', b.getAttribute('data-v')===selColor));
+    iconBtns.forEach(b=>b.addEventListener('click', ()=>{ selIcon=b.getAttribute('data-v'); syncIcons(); }));
+    colorBtns.forEach(b=>b.addEventListener('click', ()=>{ selColor=b.getAttribute('data-v'); syncColors(); }));
+    syncIcons(); syncColors();
+
+    overlay.querySelector('#deleteFolderBtn')?.addEventListener('click', ()=>{
+      closeModal();
+      confirmDialog('Eliminare cartella?', `I ${euro(existing.amount)} in "${existing.name}" torneranno ai non assegnati.`, ()=>{
+        STATE.money.unallocated += existing.amount;
+        STATE.money.categories = STATE.money.categories.filter(c=>c.id!==existing.id);
+        recalcTotal();
+        saveMoney();
+        toast('Cartella eliminata');
+        navigate('money');
+      });
+    });
+
+    overlay.querySelector('#saveFolderBtn').addEventListener('click', ()=>{
+      const name = overlay.querySelector('#folderName').value.trim();
+      const desc = overlay.querySelector('#folderDesc').value.trim();
+      if(!name){ toast('Dai un nome alla cartella'); return; }
+      if(isEdit){
+        existing.name = name; existing.description = desc; existing.icon = selIcon; existing.color = selColor;
+        saveMoney();
+        toast('Cartella aggiornata');
+        closeModal();
+        navigate('money');
+      } else {
+        const initialRaw = overlay.querySelector('#folderInitial')?.value;
+        let initial = parseFloat(initialRaw) || 0;
+        if(initial > moneyUnallocated()) initial = moneyUnallocated();
+        const cat = { id:uid('cat'), name, description:desc, icon:selIcon, color:selColor, amount:initial, createdAt:todayISO() };
+        STATE.money.categories.push(cat);
+        STATE.money.unallocated -= initial;
+        recalcTotal();
+        if(initial > 0){
+          STATE.money.transactions.push({ id:uid('tx'), type:'transfer', amount:initial, categoryId:cat.id, description:'Fondi iniziali', date: todayISO() });
+        }
+        saveMoney();
+        toast('Cartella creata ✨');
+        closeModal();
+        renderView();
+      }
+    });
+  }});
+}
+
+function openFolderDetail(id){
+  const c = moneyCategoryById(id);
+  if(!c) return;
+  const txs = STATE.money.transactions.filter(t=>t.categoryId===id).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
+  openModal(`
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:12px;background:${c.color}22;color:${c.color};display:flex;align-items:center;justify-content:center;">${ICONS[c.icon]}</div>
+        <div>
+          <h3 class="modal-title">${escapeHtml(c.name)}</h3>
+          ${c.description ? `<p style="font-size:12px;color:var(--ink-faint);">${escapeHtml(c.description)}</p>` : ''}
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">${ICONS.close}</button>
+    </div>
+    <div style="text-align:center;padding:14px 0 22px 0;">
+      <div style="font-family:var(--font-display);font-size:38px;font-weight:600;">${euro(c.amount)}</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:20px;">
+      <button class="btn btn-secondary btn-sm" style="flex:1;" id="folderAddMoney">${ICONS.plus} Aggiungi</button>
+      <button class="btn btn-secondary btn-sm" style="flex:1;" id="folderRemoveMoney">− Rimuovi</button>
+      <button class="btn btn-secondary btn-sm" style="flex:1;" id="folderTransfer">${ICONS.swap} Sposta</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span class="section-title" style="margin-bottom:0;font-size:13px;">Ultimi movimenti</span>
+      <button class="btn btn-ghost btn-sm" id="folderEditBtn">${ICONS.edit} Modifica</button>
+    </div>
+    <div>
+      ${txs.length ? txs.map(t=>`
+        <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px;">
+          <span style="color:var(--ink-soft);">${escapeHtml(t.description||'')} · ${fmtDateShort(t.date)}</span>
+          <strong style="color:${t.type==='expense'?'var(--danger)':'var(--success)'};">${t.type==='expense'?'-':'+'}${euro(Math.abs(t.amount))}</strong>
+        </div>`).join('') : `<p style="font-size:12.5px;color:var(--ink-faint);">Nessun movimento ancora.</p>`}
+    </div>
+  `, { onMount:(overlay)=>{
+    overlay.querySelector('#folderEditBtn').addEventListener('click', ()=>openFolderModal(c));
+    overlay.querySelector('#folderAddMoney').addEventListener('click', ()=>openFolderAdjustModal(c, 'add'));
+    overlay.querySelector('#folderRemoveMoney').addEventListener('click', ()=>openFolderAdjustModal(c, 'remove'));
+    overlay.querySelector('#folderTransfer').addEventListener('click', ()=>openTransferModal(c));
+  }});
+}
+
+function openFolderAdjustModal(cat, mode){
+  const isAdd = mode === 'add';
+  openModal(`
+    ${modalHead(isAdd ? `Aggiungi a ${cat.name}` : `Rimuovi da ${cat.name}`)}
+    <div class="field">
+      <label class="field-label">Importo</label>
+      <input type="number" id="adjAmount" placeholder="0,00" step="0.01" min="0">
+    </div>
+    <div class="field">
+      <label class="field-label">Descrizione</label>
+      <input type="text" id="adjDesc" placeholder="Es. Vendita, regalo, spesa...">
+    </div>
+    ${!isAdd ? `<p style="font-size:11.5px;color:var(--ink-faint);">Disponibile in cartella: ${euro(cat.amount)}</p>`:''}
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-primary" id="confirmAdj">${ICONS.check} Conferma</button>
+    </div>
+  `, { onMount:(overlay)=>{
+    overlay.querySelector('#adjAmount').focus();
+    overlay.querySelector('#confirmAdj').addEventListener('click', ()=>{
+      const amount = parseFloat(overlay.querySelector('#adjAmount').value);
+      const desc = overlay.querySelector('#adjDesc').value.trim();
+      if(!amount || amount<=0){ toast('Inserisci un importo valido'); return; }
+      if(isAdd){
+        cat.amount += amount;
+        STATE.money.unallocated -= amount; // moves from unallocated pool into folder to keep totals consistent
+        STATE.money.transactions.push({ id:uid('tx'), type:'income', amount, categoryId:cat.id, description: desc||'Entrata', date: todayISO() });
+        toast(`${euro(amount)} aggiunti a ${cat.name}`);
+      } else {
+        if(amount > cat.amount){ toast('Importo superiore al saldo della cartella'); return; }
+        cat.amount -= amount;
+        STATE.money.unallocated += amount;
+        STATE.money.transactions.push({ id:uid('tx'), type:'expense', amount, categoryId:cat.id, description: desc||'Uscita', date: todayISO() });
+        toast(`${euro(amount)} rimossi da ${cat.name}`);
+      }
+      recalcTotal();
+      saveMoney();
+      closeModal();
+      renderView();
+    });
+  }});
+}
+
+function openTransferModal(fromCat){
+  const others = STATE.money.categories.filter(c=>c.id!==fromCat.id);
+  openModal(`
+    ${modalHead(`Sposta da ${fromCat.name}`)}
+    <div class="field">
+      <label class="field-label">Verso</label>
+      <select id="transferTarget">
+        <option value="__unallocated__">Non assegnati</option>
+        ${others.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label">Importo</label>
+      <input type="number" id="transferAmount" step="0.01" min="0" placeholder="0,00">
+      <p style="font-size:11.5px;color:var(--ink-faint);margin-top:6px;">Disponibile: ${euro(fromCat.amount)}</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-primary" id="confirmTransfer">${ICONS.swap} Sposta</button>
+    </div>
+  `, { onMount:(overlay)=>{
+    overlay.querySelector('#confirmTransfer').addEventListener('click', ()=>{
+      const targetId = overlay.querySelector('#transferTarget').value;
+      const amount = parseFloat(overlay.querySelector('#transferAmount').value);
+      if(!amount || amount<=0){ toast('Inserisci un importo valido'); return; }
+      if(amount > fromCat.amount){ toast('Importo superiore al saldo disponibile'); return; }
+      fromCat.amount -= amount;
+      let targetName = 'Non assegnati';
+      if(targetId === '__unallocated__'){
+        STATE.money.unallocated += amount;
+      } else {
+        const target = moneyCategoryById(targetId);
+        target.amount += amount;
+        targetName = target.name;
+      }
+      STATE.money.transactions.push({ id:uid('tx'), type:'transfer', amount, categoryId:fromCat.id, description:`Trasferito a ${targetName}`, date: todayISO() });
+      recalcTotal();
+      saveMoney();
+      closeModal();
+      toast(`${euro(amount)} spostati verso ${targetName}`);
+      renderView();
+    });
+  }});
+}
+
+function openAddTransactionModal(){
+  ensureMoney();
+  if(STATE.money.categories.length === 0){
+    toast('Crea prima almeno una cartella');
+    openFolderModal();
+    return;
+  }
+  let type = 'expense';
+  openModal(`
+    ${modalHead('Nuovo movimento')}
+    <div class="field">
+      <label class="field-label">Tipo</label>
+      <div class="seg" id="txTypeSeg">
+        <button type="button" data-v="income" class="">Entrata</button>
+        <button type="button" data-v="expense" class="active">Uscita</button>
+        <button type="button" data-v="transfer" class="">Trasferimento</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Importo</label>
+      <input type="number" id="txAmount" placeholder="0,00" step="0.01" min="0">
+    </div>
+    <div class="field" id="txCategoryField">
+      <label class="field-label">Cartella</label>
+      <select id="txCategory">
+        ${STATE.money.categories.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field" id="txTargetField" style="display:none;">
+      <label class="field-label">Verso</label>
+      <select id="txTarget">
+        <option value="__unallocated__">Non assegnati</option>
+        ${STATE.money.categories.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label">Descrizione</label>
+      <input type="text" id="txDesc" placeholder="Es. Regalo della nonna">
+    </div>
+    <div class="field">
+      <label class="field-label">Data</label>
+      <input type="date" id="txDate" value="${new Date().toISOString().slice(0,10)}">
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-primary" id="confirmTx">${ICONS.check} Aggiungi</button>
+    </div>
+  `, { onMount:(overlay)=>{
+    const seg = overlay.querySelector('#txTypeSeg');
+    seg.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+      type = b.getAttribute('data-v');
+      seg.querySelectorAll('button').forEach(x=>x.classList.toggle('active', x===b));
+      overlay.querySelector('#txTargetField').style.display = type==='transfer' ? 'block' : 'none';
+    }));
+    overlay.querySelector('#confirmTx').addEventListener('click', ()=>{
+      const amount = parseFloat(overlay.querySelector('#txAmount').value);
+      const categoryId = overlay.querySelector('#txCategory').value;
+      const desc = overlay.querySelector('#txDesc').value.trim();
+      const date = overlay.querySelector('#txDate').value || new Date().toISOString().slice(0,10);
+      if(!amount || amount<=0){ toast('Inserisci un importo valido'); return; }
+      const cat = moneyCategoryById(categoryId);
+      if(type === 'income'){
+        cat.amount += amount;
+        STATE.money.unallocated -= amount;
+      } else if(type === 'expense'){
+        if(amount > cat.amount){ toast('Fondi insufficienti in questa cartella'); return; }
+        cat.amount -= amount;
+        STATE.money.unallocated += amount;
+      } else {
+        const targetId = overlay.querySelector('#txTarget').value;
+        if(amount > cat.amount){ toast('Fondi insufficienti in questa cartella'); return; }
+        cat.amount -= amount;
+        if(targetId === '__unallocated__') STATE.money.unallocated += amount;
+        else moneyCategoryById(targetId).amount += amount;
+      }
+      recalcTotal();
+      STATE.money.transactions.push({ id:uid('tx'), type, amount, categoryId, description: desc, date: new Date(date).toISOString() });
+      saveMoney();
+      closeModal();
+      toast(type==='expense' ? `${euro(amount)} registrati come uscita` : type==='income' ? `${euro(amount)} aggiunti` : 'Trasferimento registrato');
+      renderView();
+    });
+  }});
+}
+
+/* ============================ WISHLIST ============================ */
+const WISHLIST_CATEGORIES = ['Makeup','Skincare','Outfit','Scarpe','Borse','Accessori','Gioielli','Tecnologia','Casa','Regali','Beauty','Altro'];
+const WISHLIST_PRIORITIES = ['Bassa','Media','Alta'];
+
+const KEYWORD_MAP = [
+  { cat:'Makeup', words:['lip gloss','rossetto','gloss','mascara','fondotinta','blush','ombretto','eyeliner','matita occhi','correttore','cipria','bronzer','highlighter','palette'] },
+  { cat:'Skincare', words:['crema','siero','serum','detergente','skincare','maschera viso','tonico','contorno occhi','spf','solare viso','retinolo'] },
+  { cat:'Scarpe', words:['tacchi','tacco','scarpe','sneakers','sandali','stivali','ballerine','décolleté','decollete','mocassini','infradito'] },
+  { cat:'Gioielli', words:['collana','anello','bracciale','orecchini','gioiello','swarovski','pandora','charm'] },
+  { cat:'Borse', words:['borsa','borsetta','zaino','pochette','clutch','tracolla'] },
+  { cat:'Outfit', words:['vestito','abito','maglia','maglietta','felpa','jeans','pantaloni','gonna','top','camicia','giacca','cappotto','blazer','shorts','pantaloncini'] },
+  { cat:'Tecnologia', words:['ipad','iphone','airpods','laptop','computer','tablet','smartwatch','cuffie','macbook','fotocamera','powerbank'] },
+  { cat:'Beauty', words:['profumo','parfum','deodorante','shampoo','balsamo','spazzola capelli','piastra','phon'] },
+  { cat:'Casa', words:['candela','cuscino','plaid','lampada','decorazione','vaso','tazza'] },
+  { cat:'Accessori', words:['occhiali da sole','occhiali','cintura','cappello','sciarpa','foulard','guanti'] },
+  { cat:'Regali', words:['regalo','gift card','buono regalo'] },
+];
+function classifyWishlistItem(name){
+  const n = name.toLowerCase();
+  for(const entry of KEYWORD_MAP){
+    for(const w of entry.words){
+      if(n.includes(w)) return entry.cat;
+    }
+  }
+  return 'Altro';
+}
+/* AI classification hook — used only if CONFIG/settings.aiEnabled, falls back silently */
+async function classifyWithAI(name){
+  if(!STATE.settings.aiEnabled || !STATE.settings.aiApiKey) return null;
+  try{
+    // Placeholder integration point for Gemini/OpenAI-style classification.
+    // Expected external response shape: { category, subcategory, tags: [] }
+    return null; // not wired to a live endpoint in this build; local fallback always used
+  }catch(e){ console.warn('AI classify failed, using local fallback', e); return null; }
+}
+
+function ensureWishlistImage(item){ return item.image || null; }
+
+function renderWishlist(root){
+  const items = STATE.wishlist;
+  const total = items.length;
+  const purchased = items.filter(i=>i.purchased).length;
+  const estValue = items.reduce((s,i)=>s + (Number(i.price)||0), 0);
+
+  root.innerHTML = `
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Wishlist</h1>
+        <p class="page-sub">Tutto quello che desideri, in un unico posto.</p>
+      </div>
+    </div>
+
+    ${total === 0 ? `
+      <div class="card empty-state">
+        <div class="empty-icon">${ICONS.wishlist}</div>
+        <div class="empty-title">La tua wishlist è vuota</div>
+        <p class="empty-sub">Salva tutto quello che desideri: l'app la organizza automaticamente per categoria.</p>
+        <button class="btn btn-primary" id="emptyAddWish">${ICONS.plus} Aggiungi</button>
+      </div>
+    ` : `
+      <div style="display:flex;gap:22px;margin-bottom:22px;flex-wrap:wrap;">
+        <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:600;">${total}</div>
+          <div style="font-size:11.5px;color:var(--ink-faint);">nella wishlist</div>
+        </div>
+        <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:600;">${purchased}</div>
+          <div style="font-size:11.5px;color:var(--ink-faint);">acquistati</div>
+        </div>
+        <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
+          <div style="font-family:var(--font-display);font-size:24px;font-weight:600;">${euro(estValue)}</div>
+          <div style="font-size:11.5px;color:var(--ink-faint);">valore stimato</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+        <div class="seg" style="width:auto;min-width:200px;">
+          <button data-v="list" class="${STATE.wishlistView==='list'?'active':''}">Lista</button>
+          <button data-v="categories" class="${STATE.wishlistView==='categories'?'active':''}">Categorie</button>
+        </div>
+        <div class="search-wrap" style="max-width:260px;">
+          ${ICONS.search}
+          <input type="text" id="wishSearch" placeholder="Cerca nella wishlist..." value="${escapeHtml(STATE.wishlistSearch)}">
+        </div>
+      </div>
+
+      <div class="chip-row" id="wishFilters">
+        ${chipBtn('all', STATE.wishlistFilter, 'Tutte')}
+        ${chipBtn('unpurchased', STATE.wishlistFilter, 'Non acquistati')}
+        ${chipBtn('purchased', STATE.wishlistFilter, 'Acquistati')}
+      </div>
+
+      <div id="wishlistContent"></div>
+    `}
+  `;
+
+  document.getElementById('emptyAddWish')?.addEventListener('click', openWishlistItemModal);
+  const seg = root.querySelector('.seg');
+  seg?.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+    STATE.wishlistView = b.getAttribute('data-v');
+    renderView();
+  }));
+  root.querySelectorAll('#wishFilters .chip').forEach(c=>{
+    c.addEventListener('click', ()=>{ STATE.wishlistFilter = c.getAttribute('data-value'); renderView(); });
+  });
+  const searchInput = document.getElementById('wishSearch');
+  searchInput?.addEventListener('input', debounce((e)=>{
+    STATE.wishlistSearch = e.target.value;
+    renderWishlistContent();
+  }, 200));
+  if(total>0) renderWishlistContent();
+}
+
+function filteredWishlist(){
+  let items = [...STATE.wishlist];
+  if(STATE.wishlistFilter === 'purchased') items = items.filter(i=>i.purchased);
+  if(STATE.wishlistFilter === 'unpurchased') items = items.filter(i=>!i.purchased);
+  if(STATE.wishlistSearch.trim()){
+    const q = STATE.wishlistSearch.toLowerCase();
+    items = items.filter(i=>i.name.toLowerCase().includes(q) || (i.category||'').toLowerCase().includes(q) || (i.notes||'').toLowerCase().includes(q));
+  }
+  return items.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+}
+
+function renderWishlistContent(){
+  const container = document.getElementById('wishlistContent');
+  if(!container) return;
+  const items = filteredWishlist();
+  if(items.length === 0){
+    container.innerHTML = `<div class="empty-state" style="padding:50px 20px;"><div class="empty-icon">${ICONS.search}</div><div class="empty-title" style="font-size:15px;">Nessun risultato</div><p class="empty-sub">Prova a modificare la ricerca o i filtri.</p></div>`;
+    return;
+  }
+  if(STATE.wishlistView === 'list'){
+    container.innerHTML = `<div class="card" style="padding:6px;">${items.map(wishRowHtml).join('')}</div>`;
+  } else {
+    const grouped = {};
+    items.forEach(i=>{ (grouped[i.category] = grouped[i.category]||[]).push(i); });
+    container.innerHTML = Object.keys(grouped).sort().map(cat=>`
+      <div style="margin-bottom:22px;">
+        <div class="section-title" style="font-size:14px;text-transform:none;">${escapeHtml(cat)} <span style="color:var(--ink-faint);font-weight:500;">· ${grouped[cat].length}</span></div>
+        <div class="card" style="padding:6px;">${grouped[cat].map(wishRowHtml).join('')}</div>
+      </div>
+    `).join('');
+  }
+  bindWishlistRowEvents(container);
+}
+
+function wishRowHtml(item){
+  return `
+  <div class="wish-row" data-id="${item.id}" style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--line);">
+    <button class="wish-check" data-id="${item.id}" aria-label="Segna come acquistato" style="width:24px;height:24px;border-radius:8px;border:1.6px solid ${item.purchased?'var(--success)':'var(--line)'};background:${item.purchased?'var(--success)':'transparent'};color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;">${item.purchased?ICONS.check:''}</button>
+    <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;background:var(--blush-100);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--rose-400,#e3a1ac);">
+      ${item.image ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;">` : ICONS.image}
+    </div>
+    <div style="flex:1;min-width:0;cursor:pointer;" class="wish-open" data-id="${item.id}">
+      <div style="font-size:13.5px;font-weight:600;${item.purchased?'text-decoration:line-through;color:var(--ink-faint);':''}">${escapeHtml(item.name)}</div>
+      <div style="font-size:11.5px;color:var(--ink-faint);display:flex;gap:6px;align-items:center;">
+        <span>${escapeHtml(item.category)}</span>
+        ${item.priority==='Alta' ? `<span class="badge badge-danger">Priorità alta</span>` : ''}
+      </div>
+    </div>
+    ${item.price ? `<div style="font-weight:700;font-size:13px;flex-shrink:0;">${euro(item.price)}</div>` : ''}
+    <button class="icon-btn wish-delete" data-id="${item.id}" style="width:32px;height:32px;flex-shrink:0;" aria-label="Elimina">${ICONS.trash}</button>
+  </div>`;
+}
+
+function bindWishlistRowEvents(container){
+  container.querySelectorAll('.wish-check').forEach(b=>b.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const item = STATE.wishlist.find(i=>i.id===b.getAttribute('data-id'));
+    item.purchased = !item.purchased;
+    saveWishlist();
+    toast(item.purchased ? 'Segnato come acquistato ✓' : 'Segnato come non acquistato');
+    renderWishlistContent();
+    if(document.getElementById('viewRoot')) renderView();
+  }));
+  container.querySelectorAll('.wish-open').forEach(b=>b.addEventListener('click', ()=>{
+    const item = STATE.wishlist.find(i=>i.id===b.getAttribute('data-id'));
+    openWishlistItemModal(item);
+  }));
+  container.querySelectorAll('.wish-delete').forEach(b=>b.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const item = STATE.wishlist.find(i=>i.id===b.getAttribute('data-id'));
+    confirmDialog('Eliminare questo desiderio?', `"${item.name}" verrà rimosso dalla wishlist.`, ()=>{
+      STATE.wishlist = STATE.wishlist.filter(i=>i.id!==item.id);
+      saveWishlist();
+      toast('Rimosso dalla wishlist');
+      renderView();
+    });
+  }));
+}
+
+function openWishlistItemModal(existing){
+  const isEdit = !!existing;
+  let category = existing?.category || null;
+  let priority = existing?.priority || 'Media';
+  let imageData = existing?.image || null;
+
+  openModal(`
+    ${modalHead(isEdit ? 'Modifica desiderio' : 'Nuovo desiderio')}
+    <div class="field">
+      <label class="field-label">Nome prodotto</label>
+      <input type="text" id="wName" placeholder="Es. Lip gloss Zucca" value="${escapeHtml(existing?.name||'')}">
+    </div>
+    <div class="field">
+      <label class="field-label">Categoria ${!isEdit ? '<span style="color:var(--ink-faint);font-weight:400;">(rilevata automaticamente)</span>' : ''}</label>
+      <select id="wCategory">
+        ${WISHLIST_CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">Prezzo (opzionale)</label>
+        <input type="number" id="wPrice" step="0.01" min="0" value="${existing?.price||''}" placeholder="0,00">
+      </div>
+      <div class="field">
+        <label class="field-label">Priorità</label>
+        <select id="wPriority">
+          ${WISHLIST_PRIORITIES.map(p=>`<option value="${p}" ${p===priority?'selected':''}>${p}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Link (opzionale)</label>
+      <input type="url" id="wUrl" placeholder="https://..." value="${escapeHtml(existing?.url||'')}">
+    </div>
+    <div class="field">
+      <label class="field-label">Immagine (opzionale)</label>
+      <div class="upload-box" id="wImageBox">
+        ${imageData ? `<img src="${imageData}">` : `${ICONS.upload}<span>Carica immagine</span>`}
+      </div>
+      <input type="file" id="wImageInput" accept="image/*" style="display:none;">
+    </div>
+    <div class="field">
+      <label class="field-label">Note (opzionale)</label>
+      <textarea id="wNotes" placeholder="Taglia, colore, dettagli...">${escapeHtml(existing?.notes||'')}</textarea>
+    </div>
+    <div class="field">
+      <label class="field-label">Scadenza/evento (opzionale)</label>
+      <input type="date" id="wDeadline" value="${existing?.deadline ? existing.deadline.slice(0,10) : ''}">
+    </div>
+    <div class="modal-foot">
+      ${isEdit ? `<button class="btn btn-danger btn-icon-only" id="wDeleteBtn">${ICONS.trash}</button>` : ''}
+      <button class="btn btn-secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-primary" id="wSaveBtn">${ICONS.check} Salva</button>
+    </div>
+  `, { onMount:(overlay)=>{
+    const nameInput = overlay.querySelector('#wName');
+    const catSelect = overlay.querySelector('#wCategory');
+    catSelect.value = category || classifyWishlistItem(nameInput.value || '');
+    let userPickedCategory = isEdit;
+    nameInput.addEventListener('input', debounce(()=>{
+      if(userPickedCategory) return;
+      catSelect.value = classifyWishlistItem(nameInput.value);
+    }, 250));
+    catSelect.addEventListener('change', ()=>{ userPickedCategory = true; });
+    nameInput.focus();
+
+    const imgBox = overlay.querySelector('#wImageBox');
+    const imgInput = overlay.querySelector('#wImageInput');
+    imgBox.addEventListener('click', ()=>imgInput.click());
+    imgInput.addEventListener('change', async ()=>{
+      const file = imgInput.files[0];
+      if(!file) return;
+      imageData = await compressImageFile(file, 700, 0.82);
+      imgBox.innerHTML = `<img src="${imageData}">`;
+    });
+
+    overlay.querySelector('#wDeleteBtn')?.addEventListener('click', ()=>{
+      closeModal();
+      confirmDialog('Eliminare questo desiderio?', `"${existing.name}" verrà rimosso.`, ()=>{
+        STATE.wishlist = STATE.wishlist.filter(i=>i.id!==existing.id);
+        saveWishlist();
+        toast('Rimosso dalla wishlist');
+        renderView();
+      });
+    });
+
+    overlay.querySelector('#wSaveBtn').addEventListener('click', ()=>{
+      const name = nameInput.value.trim();
+      if(!name){ toast('Inserisci un nome'); return; }
+      const data = {
+        name,
+        category: catSelect.value,
+        price: overlay.querySelector('#wPrice').value ? parseFloat(overlay.querySelector('#wPrice').value) : null,
+        priority: overlay.querySelector('#wPriority').value,
+        url: overlay.querySelector('#wUrl').value.trim(),
+        notes: overlay.querySelector('#wNotes').value.trim(),
+        deadline: overlay.querySelector('#wDeadline').value ? new Date(overlay.querySelector('#wDeadline').value).toISOString() : null,
+        image: imageData
+      };
+      if(isEdit){
+        Object.assign(existing, data);
+        toast('Desiderio aggiornato');
+      } else {
+        STATE.wishlist.push({ id:uid('wish'), purchased:false, createdAt: todayISO(), ...data });
+        toast('Aggiunto alla wishlist ✨');
+      }
+      saveWishlist();
+      closeModal();
+      renderView();
+    });
+  }});
+}
+
+/* ============================ WARDROBE ============================ */
+const WARDROBE_CATEGORIES = {
+  TOP: ['T-shirt','Canotta','Camicia','Maglia','Felpa','Crop top'],
+  BOTTOM: ['Jeans','Pantaloni','Shorts','Gonna'],
+  DRESS: ['Vestito'],
+  OUTERWEAR: ['Giacca','Cappotto','Blazer'],
+  SHOES: ['Sneakers','Tacchi','Stivali','Sandali','Ballerine'],
+  ACCESSORIES: ['Borse','Cinture','Cappelli','Occhiali','Gioielli']
+};
+const WARDROBE_COLORS = ['nero','bianco','beige','marrone','grigio','blu','azzurro','rosa','rosso','verde','giallo','arancione','viola'];
+const WARDROBE_SEASONS = ['primavera','estate','autunno','inverno'];
+const WARDROBE_STYLES = ['Casual','Elegant','Sporty','Streetwear','Girly','Minimal','Trendy','Chic'];
+
+function allWardrobeSubcategories(){ return Object.values(WARDROBE_CATEGORIES).flat(); }
+function macroForSub(sub){
+  for(const [macro, subs] of Object.entries(WARDROBE_CATEGORIES)) if(subs.includes(sub)) return macro;
+  return 'TOP';
+}
+
+async function resolveItemImage(item){
+  const image = item?.imageData || item?.image || null;
+  if(image) STATE.imageCache[item.id] = image;
+  return image;
+}
+
+function renderWardrobe(root){
+  const items = STATE.wardrobe;
+  root.innerHTML = `
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Il tuo armadio</h1>
+        <p class="page-sub">${items.length} capi salvati</p>
+      </div>
+      <button class="btn btn-primary btn-sm" id="btnCreateOutfitTop">${ICONS.sparkle} Crea outfit</button>
+    </div>
+
+    ${items.length === 0 ? `
+      <div class="card empty-state">
+        <div class="empty-icon">${ICONS.wardrobe}</div>
+        <div class="empty-title">Il tuo armadio è ancora vuoto</div>
+        <p class="empty-sub">Carica il primo capo e iniziamo a creare i tuoi outfit.</p>
+        <button class="btn btn-primary" id="emptyAddWardrobe">${ICONS.plus} Aggiungi capo</button>
+      </div>
+    ` : `
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+        <div class="chip-row" id="wardrobeFilters" style="margin-bottom:0;">
+          ${chipBtn('all', STATE.wardrobeFilter, 'Tutti')}
+          ${Object.keys(WARDROBE_CATEGORIES).map(m=>chipBtn(m, STATE.wardrobeFilter, macroLabel(m))).join('')}
+        </div>
+        <div class="search-wrap" style="max-width:220px;">
+          ${ICONS.search}<input type="text" id="wardrobeSearch" placeholder="Cerca capo..." value="${escapeHtml(STATE.wardrobeSearch)}">
+        </div>
+      </div>
+      <div class="wardrobe-grid" id="wardrobeGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;"></div>
+    `}
+  `;
+  document.getElementById('emptyAddWardrobe')?.addEventListener('click', ()=>openWardrobeItemModal());
+  document.getElementById('btnCreateOutfitTop')?.addEventListener('click', openOutfitWizard);
+  root.querySelectorAll('#wardrobeFilters .chip').forEach(c=>{
+    c.addEventListener('click', ()=>{ STATE.wardrobeFilter = c.getAttribute('data-value'); renderView(); });
+  });
+  document.getElementById('wardrobeSearch')?.addEventListener('input', debounce((e)=>{
+    STATE.wardrobeSearch = e.target.value; renderWardrobeGrid();
+  }, 200));
+  if(items.length) renderWardrobeGrid();
+}
+function macroLabel(m){
+  return { TOP:'Top', BOTTOM:'Bottom', DRESS:'Vestiti', OUTERWEAR:'Outerwear', SHOES:'Scarpe', ACCESSORIES:'Accessori' }[m] || m;
+}
+
+function filteredWardrobe(){
+  let items = [...STATE.wardrobe];
+  if(STATE.wardrobeFilter !== 'all') items = items.filter(i=>macroForSub(i.subcategory)===STATE.wardrobeFilter);
+  if(STATE.wardrobeSearch.trim()){
+    const q = STATE.wardrobeSearch.toLowerCase();
+    items = items.filter(i=>i.name.toLowerCase().includes(q) || (i.color||'').toLowerCase().includes(q) || (i.style||'').toLowerCase().includes(q));
+  }
+  return items.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+}
+
+async function renderWardrobeGrid(){
+  const grid = document.getElementById('wardrobeGrid');
+  if(!grid) return;
+  const items = filteredWardrobe();
+  if(items.length === 0){
+    grid.style.display='block';
+    grid.innerHTML = `<div class="empty-state" style="padding:40px 20px;"><div class="empty-icon">${ICONS.search}</div><div class="empty-title" style="font-size:15px;">Nessun capo trovato</div></div>`;
+    return;
+  }
+  grid.style.display = 'grid';
+  grid.innerHTML = items.map(i=>wardrobeCardSkeleton(i)).join('');
+  for(const item of items){
+    const img = await resolveItemImage(item);
+    const cardImg = grid.querySelector(`[data-imgfor="${item.id}"]`);
+    if(cardImg && img) cardImg.innerHTML = `<img src="${img}" alt="${escapeHtml(item.name)}" style="width:100%;height:100%;object-fit:cover;">`;
+  }
+  grid.querySelectorAll('.wardrobe-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      const item = STATE.wardrobe.find(i=>i.id===card.getAttribute('data-id'));
+      openWardrobeItemModal(item);
+    });
+  });
+}
+function wardrobeCardSkeleton(item){
+  return `
+  <div class="card wardrobe-card" data-id="${item.id}" style="padding:0;overflow:hidden;cursor:pointer;">
+    <div data-imgfor="${item.id}" style="aspect-ratio:1;background:var(--blush-50);display:flex;align-items:center;justify-content:center;color:var(--rose-300,var(--blush-300));">${ICONS.image}</div>
+    <div style="padding:10px 12px;">
+      <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(item.name)}</div>
+      <div style="font-size:11px;color:var(--ink-faint);text-transform:capitalize;">${escapeHtml(item.subcategory)} · ${escapeHtml(item.color)}</div>
+    </div>
+  </div>`;
+}
+
+function openWardrobeItemModal(existing){
+  const isEdit = !!existing;
+  let subcategory = existing?.subcategory || allWardrobeSubcategories()[0];
+  let color = existing?.color || WARDROBE_COLORS[0];
+  let seasons = existing?.season ? [...existing.season] : [];
+  let style = existing?.style || WARDROBE_STYLES[0];
+  let imageData = null; // dataURL preview, persisted in Supabase
+  let existingImageRef = existing?.imageData || existing?.image || null;
+
+  openModal(`
+    ${modalHead(isEdit ? 'Modifica capo' : 'Nuovo capo')}
+    <div class="field">
+      <label class="field-label">Foto</label>
+      <div class="upload-box" id="gImageBox" style="aspect-ratio:4/3;">
+        ${ICONS.camera}<span>Carica o scatta una foto</span>
+      </div>
+      <input type="file" id="gImageInput" accept="image/*" capture="environment" style="display:none;">
+    </div>
+    <div class="field">
+      <label class="field-label">Nome</label>
+      <input type="text" id="gName" placeholder="Es. Top bianco" value="${escapeHtml(existing?.name||'')}">
+    </div>
+    <div class="field">
+      <label class="field-label">Sottocategoria</label>
+      <select id="gSub">
+        ${Object.entries(WARDROBE_CATEGORIES).map(([macro,subs])=>`
+          <optgroup label="${macroLabel(macro)}">
+            ${subs.map(s=>`<option value="${s}">${s}</option>`).join('')}
+          </optgroup>`).join('')}
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label">Colore</label>
+      <div class="opt-grid" id="gColors">
+        ${WARDROBE_COLORS.map(c=>`<button type="button" class="opt-btn color-opt" data-v="${c}" style="text-transform:capitalize;">${c}</button>`).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Stile</label>
+      <div class="opt-grid" id="gStyles">
+        ${WARDROBE_STYLES.map(s=>`<button type="button" class="opt-btn style-opt" data-v="${s}">${s}</button>`).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Stagioni</label>
+      <div class="opt-grid" id="gSeasons">
+        ${WARDROBE_SEASONS.map(s=>`<button type="button" class="opt-btn season-opt" data-v="${s}" style="text-transform:capitalize;">${s}</button>`).join('')}
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">Temp. minima consigliata (°C)</label>
+        <input type="number" id="gMinTemp" value="${existing?.minTemp ?? ''}" placeholder="Es. 15">
+      </div>
+      <div class="field">
+        <label class="field-label">Temp. massima consigliata (°C)</label>
+        <input type="number" id="gMaxTemp" value="${existing?.maxTemp ?? ''}" placeholder="Es. 28">
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Formalità</label>
+      <select id="gFormality">
+        <option value="casual" ${existing?.formality==='casual'?'selected':''}>Casual</option>
+        <option value="smart" ${existing?.formality==='smart'?'selected':''}>Smart / semi-elegante</option>
+        <option value="formal" ${existing?.formality==='formal'?'selected':''}>Elegante</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label">Materiale (opzionale)</label>
+      <input type="text" id="gMaterial" value="${escapeHtml(existing?.material||'')}" placeholder="Es. Cotone, denim...">
+    </div>
+    <div class="field">
+      <label class="field-label">Note (opzionale)</label>
+      <textarea id="gNotes" placeholder="Dettagli aggiuntivi...">${escapeHtml(existing?.notes||'')}</textarea>
+    </div>
+    <div class="modal-foot">
+      ${isEdit ? `<button class="btn btn-danger btn-icon-only" id="gDeleteBtn">${ICONS.trash}</button>` : ''}
+      <button class="btn btn-secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-primary" id="gSaveBtn">${ICONS.check} Salva</button>
+    </div>
+  `, { onMount: async (overlay)=>{
+    const imgBox = overlay.querySelector('#gImageBox');
+    const imgInput = overlay.querySelector('#gImageInput');
+    if(existingImageRef){
+      const existingImg = existingImageRef;
+      if(existingImg) imgBox.innerHTML = `<img src="${existingImg}">`;
+    }
+    imgBox.addEventListener('click', ()=>imgInput.click());
+    imgInput.addEventListener('change', async ()=>{
+      const file = imgInput.files[0];
+      if(!file) return;
+      imageData = await compressImageFile(file, 900, 0.82);
+      imgBox.innerHTML = `<img src="${imageData}">`;
+    });
+
+    const subSelect = overlay.querySelector('#gSub');
+    subSelect.value = subcategory;
+
+    const colorBtns = overlay.querySelectorAll('.color-opt');
+    colorBtns.forEach(b=>b.addEventListener('click', ()=>{ color=b.getAttribute('data-v'); colorBtns.forEach(x=>x.classList.toggle('active',x===b)); }));
+    colorBtns.forEach(b=>b.classList.toggle('active', b.getAttribute('data-v')===color));
+
+    const styleBtns = overlay.querySelectorAll('.style-opt');
+    styleBtns.forEach(b=>b.addEventListener('click', ()=>{ style=b.getAttribute('data-v'); styleBtns.forEach(x=>x.classList.toggle('active',x===b)); }));
+    styleBtns.forEach(b=>b.classList.toggle('active', b.getAttribute('data-v')===style));
+
+    const seasonBtns = overlay.querySelectorAll('.season-opt');
+    seasonBtns.forEach(b=>b.addEventListener('click', ()=>{
+      const v = b.getAttribute('data-v');
+      if(seasons.includes(v)) seasons = seasons.filter(s=>s!==v); else seasons.push(v);
+      b.classList.toggle('active');
+    }));
+    seasonBtns.forEach(b=>b.classList.toggle('active', seasons.includes(b.getAttribute('data-v'))));
+
+    overlay.querySelector('#gDeleteBtn')?.addEventListener('click', ()=>{
+      closeModal();
+      confirmDialog('Eliminare questo capo?', `"${existing.name}" verrà rimosso dall'armadio.`, async ()=>{
+        STATE.wardrobe = STATE.wardrobe.filter(i=>i.id!==existing.id);
+        saveWardrobe();
+        toast('Capo eliminato');
+        renderView();
+      });
+    });
+
+    overlay.querySelector('#gSaveBtn').addEventListener('click', async ()=>{
+      const name = overlay.querySelector('#gName').value.trim();
+      if(!name){ toast('Inserisci un nome'); return; }
+      let imageRef = existingImageRef;
+      if(imageData){
+        imageRef = imageData;
+        STATE.imageCache[imageRef] = imageData;
+      }
+      const data = {
+        name, subcategory: subSelect.value, color, style, season: seasons,
+        minTemp: overlay.querySelector('#gMinTemp').value ? parseFloat(overlay.querySelector('#gMinTemp').value) : null,
+        maxTemp: overlay.querySelector('#gMaxTemp').value ? parseFloat(overlay.querySelector('#gMaxTemp').value) : null,
+        formality: overlay.querySelector('#gFormality').value,
+        material: overlay.querySelector('#gMaterial').value.trim(),
+        notes: overlay.querySelector('#gNotes').value.trim(),
+        imageData: imageRef
+      };
+      if(isEdit){
+        Object.assign(existing, data);
+        toast('Capo aggiornato');
+      } else {
+        STATE.wardrobe.push({ id:uid('item'), category: macroForSub(data.subcategory), tags:[], createdAt: todayISO(), ...data });
+        toast('Capo aggiunto al tuo armadio ✨');
+      }
+      saveWardrobe();
+      closeModal();
+      renderView();
+    });
+  }});
+}
+
+/* ============================ WEATHER ============================ */
+async function getWeather(force=false){
+  const cache = STATE.weatherCache;
+  const cacheValidMs = CONFIG.weatherCacheMinutes * 60 * 1000;
+  if(!force && cache && (Date.now() - cache.timestamp) < cacheValidMs){
+    return cache.data;
+  }
+  try{
+    const lat = STATE.settings.weatherLat, lon = STATE.settings.weatherLon;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,precipitation,rain,wind_speed_10m,relative_humidity_2m,weather_code&timezone=auto`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('weather fetch failed');
+    const json = await res.json();
+    const data = {
+      temp: Math.round(json.current.temperature_2m),
+      feelsLike: Math.round(json.current.apparent_temperature),
+      precipitation: json.current.precipitation,
+      rain: json.current.rain,
+      wind: Math.round(json.current.wind_speed_10m),
+      humidity: json.current.relative_humidity_2m,
+      code: json.current.weather_code,
+      demo: false,
+      city: STATE.settings.weatherCity
+    };
+    STATE.weatherCache = { data, timestamp: Date.now() };
+    saveWeatherCache();
+    return data;
+  }catch(e){
+    console.warn('Weather API unavailable, using demo mode', e);
+    const demo = { temp:22, feelsLike:21, precipitation:0, rain:0, wind:9, humidity:55, code:2, demo:true, city: STATE.settings.weatherCity };
+    STATE.weatherCache = { data: demo, timestamp: Date.now() };
+    saveWeatherCache();
+    return demo;
+  }
+}
+function weatherCodeLabel(code, demo){
+  if(demo) return 'Parzialmente nuvoloso';
+  const map = {
+    0:'Sereno',1:'Prevalentemente sereno',2:'Parzialmente nuvoloso',3:'Nuvoloso',
+    45:'Nebbia',48:'Nebbia con brina',
+    51:'Pioggerella leggera',53:'Pioggerella',55:'Pioggerella intensa',
+    61:'Pioggia leggera',63:'Pioggia',65:'Pioggia intensa',
+    71:'Neve leggera',73:'Neve',75:'Neve intensa',
+    80:'Rovesci leggeri',81:'Rovesci',82:'Rovesci intensi',
+    95:'Temporale',96:'Temporale con grandine',99:'Temporale forte'
+  };
+  return map[code] || 'Variabile';
+}
+function weatherIsRainy(code){ return [51,53,55,61,63,65,80,81,82,95,96,99].includes(code); }
+function weatherIconFor(code, demo){
+  if(demo) return ICONS.cloud;
+  if(weatherIsRainy(code)) return ICONS.rain;
+  if([0,1].includes(code)) return ICONS.sun;
+  return ICONS.cloud;
+}
+async function tryGeolocate(){
+  if(!navigator.geolocation) { toast('Geolocalizzazione non disponibile'); return; }
+  navigator.geolocation.getCurrentPosition((pos)=>{
+    STATE.settings.weatherLat = pos.coords.latitude;
+    STATE.settings.weatherLon = pos.coords.longitude;
+    STATE.settings.useGeolocation = true;
+    saveSettings();
+    toast('Posizione aggiornata ✨');
+    getWeather(true).then(()=>renderView());
+  }, ()=>{ toast('Non è stato possibile ottenere la posizione'); }, { timeout:8000 });
+}
+
+/* ============================ OUTFIT ENGINE ============================ */
+const OCCASIONS = [
+  { id:'parco', label:'Parco', icon:'🌳', formality:'casual', styleBoost:['Casual','Sporty','Girly'] },
+  { id:'cena', label:'Cena', icon:'🍝', formality:'smart', styleBoost:['Chic','Elegant','Trendy'] },
+  { id:'ristorante', label:'Ristorante', icon:'🍸', formality:'formal', styleBoost:['Elegant','Chic'] },
+  { id:'amiche', label:'Uscita con le amiche', icon:'👯', formality:'casual', styleBoost:['Girly','Trendy','Casual'] },
+  { id:'shopping', label:'Shopping', icon:'🛍', formality:'casual', styleBoost:['Casual','Trendy','Streetwear'] },
+  { id:'festa', label:'Festa', icon:'🎉', formality:'smart', styleBoost:['Trendy','Chic','Girly'] },
+  { id:'scuola', label:'Scuola / Università', icon:'🏫', formality:'casual', styleBoost:['Casual','Minimal','Streetwear'] },
+  { id:'lavoro', label:'Lavoro', icon:'💼', formality:'smart', styleBoost:['Minimal','Chic'] },
+  { id:'appuntamento', label:'Appuntamento', icon:'❤️', formality:'smart', styleBoost:['Girly','Chic','Elegant'] },
+  { id:'viaggio', label:'Viaggio', icon:'✈️', formality:'casual', styleBoost:['Casual','Sporty','Minimal'] },
+  { id:'casual', label:'Giornata casual', icon:'☀️', formality:'casual', styleBoost:['Casual','Minimal'] },
+  { id:'elegante', label:'Evento elegante', icon:'✨', formality:'formal', styleBoost:['Elegant','Chic'] },
+  { id:'custom', label:'Personalizzato', icon:'✎', formality:'casual', styleBoost:[] },
+];
+
+/* weather rule engine — modifiable temperature bands */
+const WEATHER_BANDS = [
+  { max:5,  allow:['Cappotto','Giacca','Stivali','Jeans','Pantaloni','Maglia','Felpa'], avoid:['Shorts','Canotta','Sandali','Crop top'] },
+  { max:12, allow:['Giacca','Felpa','Jeans','Pantaloni','Maglia','Sneakers','Stivali'], avoid:['Shorts','Canotta','Sandali'] },
+  { max:18, allow:['Maglia','Jeans','Giacca','Camicia','Sneakers','Ballerine'], avoid:['Canotta'] },
+  { max:24, allow:['T-shirt','Top','Pantaloni','Shorts','Camicia','Sneakers','Ballerine','Sandali'], avoid:['Cappotto'] },
+  { max:30, allow:['Top','T-shirt','Shorts','Gonna','Vestito','Canotta','Sandali'], avoid:['Cappotto','Felpa','Maglia'] },
+  { max:99, allow:['Top','T-shirt','Shorts','Canotta','Sandali'], avoid:['Cappotto','Felpa','Maglia','Giacca','Jeans'] },
+];
+function weatherBandFor(temp){ return WEATHER_BANDS.find(b=>temp <= b.max) || WEATHER_BANDS[WEATHER_BANDS.length-1]; }
+
+/* color compatibility groups */
+const NEUTRALS = ['nero','bianco','beige','grigio','marrone'];
+const COLOR_COMPAT = {
+  nero:['bianco','beige','grigio','rosa','rosso','blu','viola','tutti'],
+  bianco:['nero','beige','blu','rosa','azzurro','verde','giallo','marrone','tutti'],
+  beige:['nero','bianco','marrone','blu','verde','viola','tutti'],
+  grigio:['nero','bianco','rosa','blu','azzurro','viola','tutti'],
+  marrone:['beige','bianco','arancione','verde','azzurro'],
+  blu:['bianco','beige','grigio','giallo','arancione'],
+  azzurro:['bianco','beige','grigio','giallo','marrone'],
+  rosa:['bianco','nero','grigio','beige','viola'],
+  rosso:['nero','bianco','beige','blu'],
+  verde:['bianco','beige','marrone','giallo'],
+  giallo:['bianco','blu','nero','azzurro','marrone'],
+  arancione:['bianco','blu','marrone','beige'],
+  viola:['bianco','nero','grigio','beige','rosa'],
+};
+function colorCompat(c1, c2){
+  if(!c1 || !c2) return 0.6;
+  if(c1===c2) return 0.9;
+  if(NEUTRALS.includes(c1) || NEUTRALS.includes(c2)) return 0.95;
+  if(COLOR_COMPAT[c1]?.includes(c2)) return 0.85;
+  return 0.45;
+}
+
+function itemMatchesWeather(item, weather, band){
+  if(item.minTemp != null && weather.temp < item.minTemp) return false;
+  if(item.maxTemp != null && weather.temp > item.maxTemp) return false;
+  if(band.avoid.includes(item.subcategory) && item.minTemp == null && item.maxTemp == null) return false;
+  return true;
+}
+function itemMatchesRain(item, weather){
+  if(!weatherIsRainy(weather.code)) return true;
+  if(['Sandali','Ballerine'].includes(item.subcategory)) return false;
+  return true;
+}
+function itemMatchesSeason(item, weather){
+  if(!item.season || item.season.length === 0) return true;
+  const month = new Date().getMonth();
+  const seasonNow = month<=1||month===11 ? 'inverno' : month<=4 ? 'primavera' : month<=7 ? 'estate' : 'autunno';
+  return item.season.includes(seasonNow) || item.season.length >= 3;
+}
+function itemMatchesFormality(item, occasion){
+  const order = { casual:0, smart:1, formal:2 };
+  if(!item.formality) return true;
+  const diff = Math.abs(order[item.formality] - order[occasion.formality]);
+  return diff <= 1;
+}
+
+function scoreOutfitCombo(combo, weather, occasion, prefs, band){
+  let weatherScore = 0, occasionScore = 0, styleScore = 0, colorScore = 0, categoryScore = 0;
+  const pieces = Object.values(combo).filter(Boolean);
+  const n = pieces.length || 1;
+
+  pieces.forEach(item=>{
+    weatherScore += itemMatchesWeather(item, weather, band) ? 1 : 0.3;
+    weatherScore += itemMatchesRain(item, weather) ? 0.3 : 0;
+  });
+  weatherScore = weatherScore / (n*1.3);
+
+  pieces.forEach(item=>{
+    occasionScore += itemMatchesFormality(item, occasion) ? 1 : 0.35;
+  });
+  occasionScore = occasionScore / n;
+
+  pieces.forEach(item=>{
+    if(occasion.styleBoost.includes(item.style)) styleScore += 1;
+    else if(prefs.style && item.style === prefs.style) styleScore += 1;
+    else styleScore += 0.5;
+  });
+  styleScore = styleScore / n;
+  if(prefs.style && prefs.style !== 'qualsiasi'){
+    const matchCount = pieces.filter(p=>p.style===prefs.style).length;
+    styleScore = (styleScore + (matchCount/n)) / 2;
+  }
+
+  const colors = pieces.map(p=>p.color);
+  let pairs = 0, sum = 0;
+  for(let i=0;i<colors.length;i++){
+    for(let j=i+1;j<colors.length;j++){
+      sum += colorCompat(colors[i], colors[j]); pairs++;
+    }
+  }
+  colorScore = pairs ? sum/pairs : 0.7;
+  if(prefs.color && prefs.color !== 'qualsiasi'){
+    const has = colors.includes(prefs.color);
+    colorScore = (colorScore + (has?1:0.5)) / 2;
+  }
+
+  const hasTop = !!combo.top, hasBottomOrDress = !!(combo.bottom || combo.dress), hasShoes = !!combo.shoes;
+  categoryScore = ((hasTop?1:0)+(hasBottomOrDress?1:0)+(hasShoes?1:0))/3;
+
+  if(prefs.shoes && prefs.shoes !== 'qualsiasi' && combo.shoes){
+    if(combo.shoes.subcategory.toLowerCase() !== prefs.shoes) categoryScore *= 0.85;
+  }
+
+  const score = weatherScore*0.30 + occasionScore*0.25 + styleScore*0.20 + colorScore*0.15 + categoryScore*0.10;
+  return { score, breakdown:{ weatherScore, occasionScore, styleScore, colorScore, categoryScore } };
+}
+
+function generateOutfits({ wardrobe, weather, occasion, preferences }){
+  const band = weatherBandFor(weather.temp);
+  const usable = wardrobe.filter(item=>
+    itemMatchesWeather(item, weather, band) &&
+    itemMatchesRain(item, weather) &&
+    itemMatchesSeason(item, weather)
+  );
+  const bySub = (subs)=>usable.filter(i=>subs.includes(i.subcategory));
+
+  const tops = bySub(WARDROBE_CATEGORIES.TOP.concat(WARDROBE_CATEGORIES.OUTERWEAR.filter(()=>false)));
+  const outerwear = bySub(WARDROBE_CATEGORIES.OUTERWEAR);
+  const bottoms = bySub(WARDROBE_CATEGORIES.BOTTOM);
+  const dresses = bySub(WARDROBE_CATEGORIES.DRESS);
+  const shoesAll = bySub(WARDROBE_CATEGORIES.SHOES);
+  const accessories = bySub(WARDROBE_CATEGORIES.ACCESSORIES);
+  const bags = accessories.filter(a=>a.subcategory === 'Borse');
+  const otherAcc = accessories.filter(a=>a.subcategory !== 'Borse');
+
+  let shoesPool = shoesAll;
+  if(preferences.shoes && preferences.shoes !== 'qualsiasi'){
+    const preferred = shoesAll.filter(s=>s.subcategory.toLowerCase() === preferences.shoes);
+    if(preferred.length) shoesPool = preferred;
+  }
+
+  const combos = [];
+  const MAX_COMBOS = 60;
+
+  function pushCombo(top, bottom, dress, shoes, bag, accessory){
+    if(!shoes) return;
+    if(!top && !dress) return;
+    if(top && !bottom && !dress) return;
+    combos.push({ top: top||null, bottom: bottom||null, dress: dress||null, shoes, bag: bag||null, accessory: accessory||null, outerwear:null });
+  }
+
+  // dress-based combos
+  dresses.forEach(dress=>{
+    shoesPool.forEach(shoes=>{
+      const bag = bags[Math.floor(Math.random()*bags.length)] || null;
+      const acc = otherAcc[Math.floor(Math.random()*otherAcc.length)] || null;
+      pushCombo(null, null, dress, shoes, bag, acc);
+    });
+  });
+  // top+bottom combos
+  tops.forEach(top=>{
+    bottoms.forEach(bottom=>{
+      shoesPool.forEach(shoes=>{
+        if(combos.length >= MAX_COMBOS) return;
+        const bag = bags[Math.floor(Math.random()*bags.length)] || null;
+        const acc = otherAcc[Math.floor(Math.random()*otherAcc.length)] || null;
+        pushCombo(top, bottom, null, shoes, bag, acc);
+      });
+    });
+  });
+
+  if(combos.length === 0) return { outfits: [], usableCount: usable.length, reason:'not_enough_items' };
+
+  const scored = combos.map(combo=>{
+    const { score, breakdown } = scoreOutfitCombo(combo, weather, occasion, preferences, band);
+    return { combo, score, breakdown };
+  }).sort((a,b)=>b.score-a.score);
+
+  // de-duplicate very similar outfits (same top+bottom/dress) and take top 3
+  const seen = new Set();
+  const top3 = [];
+  for(const s of scored){
+    const key = `${s.combo.top?.id}-${s.combo.bottom?.id}-${s.combo.dress?.id}-${s.combo.shoes?.id}`;
+    if(seen.has(key)) continue;
+    seen.add(key);
+    top3.push(s);
+    if(top3.length >= 3) break;
+  }
+
+  return { outfits: top3, usableCount: usable.length, reason: null };
+}
+
+function outfitExplanation(combo, weather, occasion){
+  const parts = [];
+  parts.push(`Perfetto per ${weather.temp}°C`);
+  parts.push(`ideale per ${occasion.label.toLowerCase()}`);
+  const allWardrobe = true;
+  parts.push('composto interamente da capi presenti nel tuo armadio');
+  return parts.join(', ') + '.';
+}
+
+/* ============================ OUTFIT WIZARD UI ============================ */
+function openOutfitWizard(){
+  if(STATE.wardrobe.length < 2){
+    toast('Aggiungi qualche capo in più per generare un outfit');
+    return;
+  }
+  STATE.outfitDraft = { occasion:null, customText:'', style:'qualsiasi', shoes:'qualsiasi', color:'qualsiasi', coverage:'normale', onlyOwned:true };
+  renderOutfitWizardStep1();
+}
+
+function renderOutfitWizardStep1(){
+  openModal(`
+    ${modalHead('Dove stai andando?')}
+    <div class="opt-grid" id="occasionGrid" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));">
+      ${OCCASIONS.map(o=>`<button type="button" class="opt-btn occasion-opt" data-v="${o.id}" style="padding:14px 8px;display:flex;flex-direction:column;gap:6px;">
+        <span style="font-size:20px;">${o.icon}</span><span>${o.label}</span>
+      </button>`).join('')}
+    </div>
+    <div class="field" id="customOccasionField" style="display:none;margin-top:14px;">
+      <label class="field-label">Descrivi l'occasione</label>
+      <input type="text" id="customOccasionText" placeholder="Es. Devo andare a una festa in terrazza">
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-primary" id="wizNext1">Continua ${ICONS.arrowRight}</button>
+    </div>
+  `, { onMount:(overlay)=>{
+    const btns = overlay.querySelectorAll('.occasion-opt');
+    btns.forEach(b=>b.addEventListener('click', ()=>{
+      btns.forEach(x=>x.classList.toggle('active', x===b));
+      const v = b.getAttribute('data-v');
+      overlay.querySelector('#customOccasionField').style.display = v==='custom' ? 'block' : 'none';
+    }));
+    overlay.querySelector('#wizNext1').addEventListener('click', ()=>{
+      const active = overlay.querySelector('.occasion-opt.active');
+      if(!active){ toast('Scegli un\u2019occasione'); return; }
+      STATE.outfitDraft.occasion = active.getAttribute('data-v');
+      STATE.outfitDraft.customText = overlay.querySelector('#customOccasionText')?.value.trim() || '';
+      renderOutfitWizardStep2();
+    });
+  }});
+}
+
+function renderOutfitWizardStep2(){
+  const d = STATE.outfitDraft;
+  openModal(`
+    ${modalHead('Le tue preferenze')}
+    <div class="field">
+      <label class="field-label">Stile</label>
+      <div class="opt-grid">
+        ${['qualsiasi',...WARDROBE_STYLES].map(s=>`<button type="button" class="opt-btn pref-style" data-v="${s}">${s==='qualsiasi'?'Qualsiasi':s}</button>`).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Calzature</label>
+      <div class="opt-grid">
+        ${['qualsiasi','sneakers','tacchi','stivali','sandali','ballerine'].map(s=>`<button type="button" class="opt-btn pref-shoes" data-v="${s}" style="text-transform:capitalize;">${s}</button>`).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Colore preferito</label>
+      <div class="opt-grid">
+        ${['qualsiasi',...WARDROBE_COLORS].map(s=>`<button type="button" class="opt-btn pref-color" data-v="${s}" style="text-transform:capitalize;">${s}</button>`).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Livello di copertura</label>
+      <div class="seg" id="coverageSeg">
+        <button data-v="fresco">Fresco</button>
+        <button data-v="normale" class="active">Normale</button>
+        <button data-v="caldo">Caldo</button>
+      </div>
+    </div>
+    <div class="field" style="display:flex;align-items:center;gap:10px;">
+      <input type="checkbox" id="onlyOwned" checked style="width:18px;height:18px;accent-color:var(--rose-600);">
+      <label for="onlyOwned" style="font-size:13px;color:var(--ink-soft);">Usa esclusivamente capi che ho nel mio armadio</label>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" id="wizBack2">Indietro</button>
+      <button class="btn btn-primary" id="wizGenerate">${ICONS.sparkle} Genera outfit</button>
+    </div>
+  `, { onMount:(overlay)=>{
+    function bindGroup(cls, key){
+      const btns = overlay.querySelectorAll('.'+cls);
+      btns.forEach(b=>{
+        if(b.getAttribute('data-v')===d[key]) b.classList.add('active');
+        b.addEventListener('click', ()=>{ d[key]=b.getAttribute('data-v'); btns.forEach(x=>x.classList.toggle('active',x===b)); });
+      });
+    }
+    bindGroup('pref-style','style');
+    bindGroup('pref-shoes','shoes');
+    bindGroup('pref-color','color');
+    overlay.querySelectorAll('.pref-style,.pref-shoes,.pref-color').forEach(b=>{
+      if(b.getAttribute('data-v')==='qualsiasi') b.classList.add('active');
+    });
+    const covSeg = overlay.querySelector('#coverageSeg');
+    covSeg.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+      d.coverage = b.getAttribute('data-v');
+      covSeg.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));
+    }));
+    overlay.querySelector('#wizBack2').addEventListener('click', renderOutfitWizardStep1);
+    overlay.querySelector('#wizGenerate').addEventListener('click', async ()=>{
+      d.onlyOwned = overlay.querySelector('#onlyOwned').checked;
+      closeModal();
+      await runOutfitGeneration();
+    });
+  }});
+}
+
+async function runOutfitGeneration(){
+  const weather = await getWeather();
+  const occasionObj = OCCASIONS.find(o=>o.id===STATE.outfitDraft.occasion) || OCCASIONS[OCCASIONS.length-1];
+  const result = generateOutfits({ wardrobe: STATE.wardrobe, weather, occasion: occasionObj, preferences: STATE.outfitDraft });
+  if(result.outfits.length === 0){
+    toast('Non ci sono abbastanza capi compatibili');
+    return;
+  }
+  STATE.outfitCandidates = result.outfits;
+  STATE.outfitSelectedIndex = 0;
+  STATE.outfitContext = { weather, occasion: occasionObj };
+  renderOutfitResultModal();
+}
+
+function pieceImgTag(item, cacheBust){
+  if(!item) return '';
+  return `<div class="outfit-piece" data-role="${item.__role||''}" style="text-align:center;">
+    <div class="outfit-piece-img" data-imgfor="${item.id}" style="width:100%;aspect-ratio:1;border-radius:16px;background:var(--blush-50);display:flex;align-items:center;justify-content:center;color:var(--blush-300);overflow:hidden;margin-bottom:6px;">${ICONS.image}</div>
+    <div style="font-size:11.5px;font-weight:600;">${escapeHtml(item.name)}</div>
+  </div>`;
+}
+
+function renderOutfitResultModal(){
+  const cand = STATE.outfitCandidates[STATE.outfitSelectedIndex];
+  const { weather, occasion } = STATE.outfitContext;
+  const combo = cand.combo;
+  const pieces = ['top','bottom','dress','shoes','bag','accessory'].map(role=>{
+    if(combo[role]) combo[role].__role = role;
+    return combo[role];
+  }).filter(Boolean);
+
+  openModal(`
+    <div class="modal-head">
+      <div>
+        <h3 class="modal-title">Outfit del giorno</h3>
+        <p style="font-size:12px;color:var(--ink-faint);margin-top:2px;">${weather.temp}°C · ${occasion.label}</p>
+      </div>
+      <button class="modal-close" onclick="closeModal()">${ICONS.close}</button>
+    </div>
+    <div class="chip-row" id="outfitTabs">
+      ${STATE.outfitCandidates.map((c,i)=>`<button class="chip ${i===STATE.outfitSelectedIndex?'active':''}" data-i="${i}">Outfit ${i+1}${i===0?' ★':''}</button>`).join('')}
+    </div>
+    <div id="outfitPiecesGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+      ${pieces.map(p=>pieceImgTag(p)).join('')}
+    </div>
+    <div class="card" style="background:var(--blush-50);border:none;padding:16px;margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:700;color:var(--rose-700);margin-bottom:4px;">Perché questo outfit?</div>
+      <div style="font-size:13px;color:var(--ink-soft);line-height:1.5;">${outfitExplanation(combo, weather, occasion)}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button class="btn btn-secondary btn-sm" id="btnSaveOutfit">${ICONS.heart} Salva outfit</button>
+      <button class="btn btn-secondary btn-sm" id="btnRegenOutfit">${ICONS.shuffle} Genera un altro</button>
+      <button class="btn btn-secondary btn-sm" id="btnEditOutfit">${ICONS.edit} Modifica</button>
+      <button class="btn btn-secondary btn-sm" id="btnDetailsOutfit">${ICONS.info} Dettagli</button>
+    </div>
+  `, { onMount: async (overlay)=>{
+    for(const p of pieces){
+      const img = await resolveItemImage(p);
+      const box = overlay.querySelector(`.outfit-piece-img[data-imgfor="${p.id}"]`);
+      if(box && img) box.innerHTML = `<img src="${img}" style="width:100%;height:100%;object-fit:cover;">`;
+    }
+    overlay.querySelectorAll('#outfitTabs .chip').forEach(c=>c.addEventListener('click', ()=>{
+      STATE.outfitSelectedIndex = parseInt(c.getAttribute('data-i'));
+      renderOutfitResultModal();
+    }));
+    overlay.querySelector('#btnRegenOutfit').addEventListener('click', async ()=>{ closeModal(); await runOutfitGeneration(); });
+    overlay.querySelector('#btnSaveOutfit').addEventListener('click', ()=>saveCurrentOutfit(combo, weather, occasion));
+    overlay.querySelector('#btnEditOutfit').addEventListener('click', ()=>openOutfitPieceSwapper(combo, weather, occasion));
+    overlay.querySelector('#btnDetailsOutfit').addEventListener('click', ()=>{
+      const b = cand.breakdown;
+      openModal(`
+        ${modalHead('Dettagli punteggio')}
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${scoreBar('Meteo', b.weatherScore)}
+          ${scoreBar('Occasione', b.occasionScore)}
+          ${scoreBar('Stile', b.styleScore)}
+          ${scoreBar('Colori', b.colorScore)}
+          ${scoreBar('Completezza', b.categoryScore)}
+        </div>
+        <div class="modal-foot"><button class="btn btn-secondary" style="flex:1;" onclick="closeModal()">Chiudi</button></div>
+      `);
+    });
+  }});
+}
+function scoreBar(label, val){
+  const pct = Math.round(val*100);
+  return `<div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--ink-soft);">${label}</span><strong>${pct}%</strong></div>
+    <div style="height:6px;border-radius:6px;background:var(--blush-100);overflow:hidden;"><div style="height:100%;width:${pct}%;background:var(--rose-500);"></div></div>
+  </div>`;
+}
+
+function openOutfitPieceSwapper(combo, weather, occasion){
+  const roles = [
+    { key:'top', label:'Top', subs:WARDROBE_CATEGORIES.TOP },
+    { key:'bottom', label:'Bottom', subs:WARDROBE_CATEGORIES.BOTTOM },
+    { key:'shoes', label:'Scarpe', subs:WARDROBE_CATEGORIES.SHOES },
+    { key:'bag', label:'Borsa', subs:['Borse'] },
+    { key:'accessory', label:'Accessorio', subs:WARDROBE_CATEGORIES.ACCESSORIES.filter(s=>s!=='Borse') },
+  ].filter(r=>combo[r.key] !== undefined);
+
+  openModal(`
+    ${modalHead('Modifica outfit')}
+    <p style="font-size:12.5px;color:var(--ink-faint);margin-bottom:14px;">Tocca un capo per cambiarlo con un\u2019alternativa compatibile.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;" id="swapList">
+      ${roles.map(r=>{
+        const item = combo[r.key];
+        if(!item) return '';
+        return `<button type="button" class="swap-role" data-role="${r.key}" style="display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--white);cursor:pointer;text-align:left;">
+          <div style="width:44px;height:44px;border-radius:10px;background:var(--blush-50);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;" data-imgfor="${item.id}">${ICONS.image}</div>
+          <div style="flex:1;"><div style="font-size:13px;font-weight:600;">${escapeHtml(item.name)}</div><div style="font-size:11px;color:var(--ink-faint);">${r.label}</div></div>
+          ${ICONS.chevRight}
+        </button>`;
+      }).join('')}
+    </div>
+    <div class="modal-foot"><button class="btn btn-secondary" style="flex:1;" onclick="closeModal()">Chiudi</button></div>
+  `, { onMount: async (overlay)=>{
+    for(const r of roles){
+      const item = combo[r.key]; if(!item) continue;
+      const img = await resolveItemImage(item);
+      const box = overlay.querySelector(`[data-imgfor="${item.id}"]`);
+      if(box && img) box.innerHTML = `<img src="${img}" style="width:100%;height:100%;object-fit:cover;">`;
+    }
+    overlay.querySelectorAll('.swap-role').forEach(b=>b.addEventListener('click', ()=>{
+      const roleKey = b.getAttribute('data-role');
+      const role = roles.find(r=>r.key===roleKey);
+      openAlternativesPicker(role, combo, weather, occasion);
+    }));
+  }});
+}
+
+function openAlternativesPicker(role, combo, weather, occasion){
+  const band = weatherBandFor(weather.temp);
+  const alternatives = STATE.wardrobe.filter(i=>
+    role.subs.includes(i.subcategory) &&
+    itemMatchesWeather(i, weather, band) &&
+    itemMatchesRain(i, weather) &&
+    i.id !== combo[role.key]?.id
+  );
+  openModal(`
+    ${modalHead(`Cambia ${role.label.toLowerCase()}`)}
+    ${alternatives.length===0 ? `<p style="font-size:13px;color:var(--ink-faint);">Nessuna alternativa compatibile trovata nel tuo armadio.</p>` : `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;" id="altGrid">
+      ${alternatives.map(a=>`<button type="button" class="alt-item" data-id="${a.id}" style="border:1px solid var(--line);border-radius:14px;padding:0;overflow:hidden;background:var(--white);cursor:pointer;">
+        <div data-imgfor="${a.id}" style="aspect-ratio:1;background:var(--blush-50);display:flex;align-items:center;justify-content:center;">${ICONS.image}</div>
+        <div style="padding:6px;font-size:11px;font-weight:600;">${escapeHtml(a.name)}</div>
+      </button>`).join('')}
+    </div>`}
+    <div class="modal-foot"><button class="btn btn-secondary" style="flex:1;" onclick="closeModal()">Annulla</button></div>
+  `, { onMount: async (overlay)=>{
+    for(const a of alternatives){
+      const img = await resolveItemImage(a);
+      const box = overlay.querySelector(`[data-imgfor="${a.id}"]`);
+      if(box && img) box.innerHTML = `<img src="${img}" style="width:100%;height:100%;object-fit:cover;">`;
+    }
+    overlay.querySelectorAll('.alt-item').forEach(b=>b.addEventListener('click', ()=>{
+      const newItem = STATE.wardrobe.find(i=>i.id===b.getAttribute('data-id'));
+      combo[role.key] = newItem;
+      closeModal();
+      toast('Outfit aggiornato ✨');
+      STATE.outfitCandidates[STATE.outfitSelectedIndex].combo = combo;
+      renderOutfitResultModal();
+    }));
+  }});
+}
+
+function saveCurrentOutfit(combo, weather, occasion, silent){
+  const items = Object.entries(combo).filter(([k,v])=>v).map(([role,item])=>({ role, itemId:item.id, name:item.name }));
+  const outfit = {
+    id: uid('outfit'),
+    name: `${occasion.label} — ${weather.temp}°C`,
+    occasion: occasion.label,
+    weather: weatherCodeLabel(weather.code, weather.demo),
+    temperature: weather.temp,
+    items,
+    createdAt: todayISO(),
+    favorite:false
+  };
+  STATE.outfits.unshift(outfit);
+  saveOutfits();
+  STATE.todayOutfit = { outfitId: outfit.id, date: new Date().toDateString() };
+  
+  if(!silent){ closeModal(); toast('Outfit salvato ✨'); renderView(); }
+  return outfit;
+}
+
+/* ============================ OUTFIT SALVATI ============================ */
+function renderSavedOutfits(root){
+  const outfits = STATE.outfits;
+  root.innerHTML = `
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Outfit salvati</h1>
+        <p class="page-sub">${outfits.length} outfit creati</p>
+      </div>
+      <button class="btn btn-primary btn-sm" id="btnNewOutfitSaved">${ICONS.sparkle} Crea outfit</button>
+    </div>
+    ${outfits.length===0 ? `
+      <div class="card empty-state">
+        <div class="empty-icon">${ICONS.outfits}</div>
+        <div class="empty-title">Nessun outfit salvato</div>
+        <p class="empty-sub">Genera il tuo primo outfit dallo Smart Wardrobe.</p>
+        <button class="btn btn-primary" id="emptyOutfit">${ICONS.sparkle} Crea outfit</button>
+      </div>
+    ` : `
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;">
+        ${outfits.map(o=>`
+          <div class="card outfit-saved-card" data-id="${o.id}" style="cursor:pointer;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div>
+                <div style="font-size:14px;font-weight:600;">${escapeHtml(o.name)}</div>
+                <div style="font-size:11.5px;color:var(--ink-faint);margin-top:2px;">${fmtDate(o.createdAt)}</div>
+              </div>
+              <button class="icon-btn fav-btn" data-id="${o.id}" style="width:32px;height:32px;color:${o.favorite?'var(--rose-600)':'var(--ink-faint)'};">${o.favorite?ICONS.heartFill:ICONS.heart}</button>
+            </div>
+            <div style="margin-top:10px;font-size:12.5px;color:var(--ink-soft);">${o.items.map(i=>escapeHtml(i.name)).join(' + ')}</div>
+            <div style="margin-top:12px;display:flex;gap:6px;">
+              <span class="badge badge-neutral">${o.temperature}°C</span>
+              <span class="badge badge-neutral">${escapeHtml(o.occasion)}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `}
+  `;
+  document.getElementById('btnNewOutfitSaved')?.addEventListener('click', openOutfitWizard);
+  document.getElementById('emptyOutfit')?.addEventListener('click', openOutfitWizard);
+  root.querySelectorAll('.fav-btn').forEach(b=>b.addEventListener('click',(e)=>{
+    e.stopPropagation();
+    const o = STATE.outfits.find(x=>x.id===b.getAttribute('data-id'));
+    o.favorite = !o.favorite;
+    saveOutfits();
+    renderView();
+  }));
+  root.querySelectorAll('.outfit-saved-card').forEach(card=>{
+    card.addEventListener('click', ()=>openSavedOutfitDetail(card.getAttribute('data-id')));
+  });
+}
+function openSavedOutfitDetail(id){
+  const o = STATE.outfits.find(x=>x.id===id);
+  if(!o) return;
+  openModal(`
+    ${modalHead(o.name)}
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <span class="badge badge-neutral">${o.temperature}°C</span>
+      <span class="badge badge-neutral">${escapeHtml(o.occasion)}</span>
+      <span class="badge badge-neutral">${escapeHtml(o.weather)}</span>
+    </div>
+    <div class="section-title" style="font-size:13px;">Capi utilizzati</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;">
+      ${o.items.map(i=>`<div style="padding:9px 12px;background:var(--cream);border-radius:10px;font-size:12.5px;font-weight:600;">${escapeHtml(i.name)}</div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button class="btn btn-secondary btn-sm" id="dupOutfit">Duplica</button>
+      <button class="btn btn-danger btn-sm" id="delOutfit">${ICONS.trash} Elimina</button>
+    </div>
+  `, { onMount:(overlay)=>{
+    overlay.querySelector('#dupOutfit').addEventListener('click', ()=>{
+      const copy = { ...o, id:uid('outfit'), name:o.name+' (copia)', createdAt: todayISO() };
+      STATE.outfits.unshift(copy);
+      saveOutfits();
+      toast('Outfit duplicato');
+      closeModal();
+      renderView();
+    });
+    overlay.querySelector('#delOutfit').addEventListener('click', ()=>{
+      closeModal();
+      confirmDialog('Eliminare outfit?', `"${o.name}" verrà rimosso dagli outfit salvati.`, ()=>{
+        STATE.outfits = STATE.outfits.filter(x=>x.id!==o.id);
+        saveOutfits();
+        toast('Outfit eliminato');
+        renderView();
+      });
+    });
+  }});
+}
+
+/* ============================ HOME ============================ */
+async function renderHome(root){
+  ensureMoney();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Buongiorno' : hour < 18 ? 'Buon pomeriggio' : 'Buonasera';
+  const name = STATE.profile?.name || '';
+
+  root.innerHTML = `
+    <div style="margin:22px 0 26px 0;">
+      <h1 class="page-title" style="font-size:28px;">${greeting}${name ? ', '+escapeHtml(name) : ''} ✨</h1>
+      <p class="page-sub">Vediamo cosa c'è oggi.</p>
+    </div>
+
+    <div class="home-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:26px;">
+      <div class="card home-card" id="goMoney" style="cursor:pointer;">
+        <div style="width:34px;height:34px;border-radius:10px;background:var(--blush-100);color:var(--rose-600);display:flex;align-items:center;justify-content:center;">${ICONS.money}</div>
+        <div style="font-size:12px;color:var(--ink-faint);margin-top:12px;">Totale disponibile</div>
+        <div style="font-family:var(--font-display);font-size:24px;font-weight:600;margin-top:2px;">${euro(STATE.money.total)}</div>
+      </div>
+      <div class="card home-card" id="goWishlist" style="cursor:pointer;">
+        <div style="width:34px;height:34px;border-radius:10px;background:var(--blush-100);color:var(--rose-600);display:flex;align-items:center;justify-content:center;">${ICONS.wishlist}</div>
+        <div style="font-size:12px;color:var(--ink-faint);margin-top:12px;">${STATE.wishlist.length} desideri</div>
+        <div style="font-family:var(--font-display);font-size:24px;font-weight:600;margin-top:2px;">${STATE.wishlist.filter(i=>i.purchased).length} acquistati</div>
+      </div>
+      <div class="card home-card" id="goWeather" style="cursor:pointer;" id="weatherCard">
+        <div style="width:34px;height:34px;border-radius:10px;background:var(--blush-100);color:var(--rose-600);display:flex;align-items:center;justify-content:center;">${ICONS.wardrobe}</div>
+        <div style="font-size:12px;color:var(--ink-faint);margin-top:12px;" id="weatherLabelSlot">Meteo</div>
+        <div style="font-family:var(--font-display);font-size:24px;font-weight:600;margin-top:2px;" id="weatherTempSlot">···</div>
+      </div>
+    </div>
+    <style>@media(max-width:900px){.home-grid{grid-template-columns:1fr 1fr !important;}}@media(max-width:560px){.home-grid{grid-template-columns:1fr !important;}}</style>
+
+    <div class="card" style="margin-bottom:26px;background:linear-gradient(155deg,var(--blush-100),var(--blush-50));border:none;" id="outfitOfDayCard">
+      <div id="outfitOfDaySlot">${skeletonOutfitCard()}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="home-lists-grid">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="section-title" style="margin-bottom:0;">Wishlist recente</div>
+          <button class="btn btn-ghost btn-sm" id="seeAllWish">Vedi tutti ${ICONS.chevRight}</button>
+        </div>
+        ${renderRecentWishlist()}
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="section-title" style="margin-bottom:0;">Capi aggiunti di recente</div>
+          <button class="btn btn-ghost btn-sm" id="seeAllWardrobe">Vedi tutti ${ICONS.chevRight}</button>
+        </div>
+        <div id="recentWardrobeSlot">${skeletonMiniList()}</div>
+      </div>
+    </div>
+    <style>@media(max-width:800px){.home-lists-grid{grid-template-columns:1fr !important;}}</style>
+  `;
+
+  document.getElementById('goMoney').addEventListener('click', ()=>navigate('money'));
+  document.getElementById('goWishlist').addEventListener('click', ()=>navigate('wishlist'));
+  document.getElementById('goWeather').addEventListener('click', ()=>navigate('wardrobe'));
+  document.getElementById('seeAllWish').addEventListener('click', ()=>navigate('wishlist'));
+  document.getElementById('seeAllWardrobe').addEventListener('click', ()=>navigate('wardrobe'));
+
+  const recentWishBox = root.querySelector('.card');
+  bindWishlistRowEvents(root);
+  renderRecentWardrobe();
+  loadHomeWeatherAndOutfit();
+}
+
+function skeletonOutfitCard(){ return `<div class="skeleton" style="height:64px;border-radius:16px;"></div>`; }
+function skeletonMiniList(){ return `<div class="skeleton" style="height:150px;border-radius:16px;"></div>`; }
+
+function renderRecentWishlist(){
+  const recent = [...STATE.wishlist].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,4);
+  if(recent.length===0) return `<div class="card empty-state" style="padding:30px 16px;"><p class="empty-sub">Ancora nessun desiderio salvato.</p></div>`;
+  return `<div class="card" style="padding:6px;">${recent.map(wishRowHtml).join('')}</div>`;
+}
+
+async function renderRecentWardrobe(){
+  const slot = document.getElementById('recentWardrobeSlot');
+  if(!slot) return;
+  const recent = [...STATE.wardrobe].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,4);
+  if(recent.length===0){ slot.innerHTML = `<div class="card empty-state" style="padding:30px 16px;"><p class="empty-sub">Ancora nessun capo nell'armadio.</p></div>`; return; }
+  slot.innerHTML = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">${recent.map(i=>wardrobeCardSkeleton(i)).join('')}</div>`;
+  for(const item of recent){
+    const img = await resolveItemImage(item);
+    const box = slot.querySelector(`[data-imgfor="${item.id}"]`);
+    if(box && img) box.innerHTML = `<img src="${img}" style="width:100%;height:100%;object-fit:cover;">`;
+  }
+  slot.querySelectorAll('.wardrobe-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      const item = STATE.wardrobe.find(i=>i.id===card.getAttribute('data-id'));
+      openWardrobeItemModal(item);
+    });
+  });
+}
+
+async function loadHomeWeatherAndOutfit(){
+  const weather = await getWeather();
+  const labelSlot = document.getElementById('weatherLabelSlot');
+  const tempSlot = document.getElementById('weatherTempSlot');
+  if(labelSlot){
+    labelSlot.textContent = weather.demo ? 'Meteo non disponibile' : weatherCodeLabel(weather.code, false);
+    tempSlot.textContent = `${weather.temp}°`;
+  }
+
+  const todayRef = STATE.todayOutfit || null;
+  const isToday = todayRef && todayRef.date === new Date().toDateString();
+  const savedToday = isToday ? STATE.outfits.find(o=>o.id===todayRef.outfitId) : null;
+
+  const slot = document.getElementById('outfitOfDaySlot');
+  if(!slot) return;
+  if(savedToday){
+    slot.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--rose-700);">IL TUO OUTFIT DI OGGI</div>
+          <div style="font-family:var(--font-display);font-size:19px;font-weight:600;margin-top:4px;">${escapeHtml(savedToday.items.map(i=>i.name).join(' + '))}</div>
+          <div style="font-size:12px;color:var(--ink-faint);margin-top:4px;">${weather.temp}°C · ${escapeHtml(savedToday.occasion)}</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="viewTodayOutfit">Vedi dettagli ${ICONS.chevRight}</button>
+      </div>`;
+    document.getElementById('viewTodayOutfit').addEventListener('click', ()=>openSavedOutfitDetail(savedToday.id));
+  } else {
+    slot.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--rose-700);">${weather.temp}°C A ${escapeHtml((STATE.settings.weatherCity||'').toUpperCase())}</div>
+          <div style="font-family:var(--font-display);font-size:19px;font-weight:600;margin-top:4px;">Non hai ancora creato l'outfit di oggi</div>
+          <div style="font-size:12px;color:var(--ink-faint);margin-top:4px;">Scopri cosa indossare oggi, in base al meteo e al tuo armadio.</div>
+        </div>
+        <button class="btn btn-primary btn-sm" id="createOutfitHome">${ICONS.sparkle} Crea outfit</button>
+      </div>`;
+    document.getElementById('createOutfitHome').addEventListener('click', openOutfitWizard);
+  }
+}
+
+/* ============================ SETTINGS ============================ */
+function renderSettings(root){
+  const p = STATE.profile || { name:'', city:'' };
+  const s = STATE.settings;
+  root.innerHTML = `
+    <div class="page-head"><div><h1 class="page-title">Impostazioni</h1><p class="page-sub">Personalizza ${escapeHtml(getAppName())} a modo tuo.</p></div></div>
+
+    <div class="card" style="margin-bottom:18px;">
+      <div class="section-title">Profilo</div>
+      <div class="field"><label class="field-label">Nome</label><input type="text" id="setName" value="${escapeHtml(p.name||'')}"></div>
+      <div class="field" style="margin-bottom:0;"><label class="field-label">Città</label><input type="text" id="setCity" value="${escapeHtml(p.city||'')}"></div>
+      <button class="btn btn-primary btn-sm" id="saveProfileBtn" style="margin-top:12px;">${ICONS.check} Salva profilo</button>
+    </div>
+
+    <div class="card" style="margin-bottom:18px;">
+      <div class="section-title">Meteo</div>
+      <div class="field"><label class="field-label">Città</label><input type="text" id="setWeatherCity" value="${escapeHtml(s.weatherCity||'')}"></div>
+      <button class="btn btn-secondary btn-sm" id="useGeoBtn">${ICONS.info} Usa la mia posizione</button>
+      <button class="btn btn-primary btn-sm" id="saveWeatherBtn" style="margin-left:8px;">${ICONS.check} Salva città</button>
+      <p style="font-size:11.5px;color:var(--ink-faint);margin-top:10px;">Il meteo usa Open-Meteo (nessuna API key richiesta). Se non disponibile, l'app mostra dati demo chiaramente etichettati.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:18px;">
+      <div class="section-title">Intelligenza artificiale</div>
+      <div class="field" style="display:flex;align-items:center;gap:10px;">
+        <input type="checkbox" id="aiEnabledToggle" ${s.aiEnabled?'checked':''} style="width:18px;height:18px;accent-color:var(--rose-600);">
+        <label for="aiEnabledToggle" style="font-size:13px;">Abilita classificazione/generazione con AI (opzionale)</label>
+      </div>
+      <div class="field"><label class="field-label">Provider</label>
+        <select id="aiProviderSelect">
+          <option value="gemini" ${s.aiProvider==='gemini'?'selected':''}>Gemini</option>
+          <option value="openai" ${s.aiProvider==='openai'?'selected':''}>OpenAI</option>
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:8px;"><label class="field-label">API key</label><input type="password" id="aiApiKeyInput" value="${escapeHtml(s.aiApiKey||'')}" placeholder="Incolla qui la tua API key"></div>
+      <p style="font-size:11.5px;color:var(--danger);margin-bottom:12px;line-height:1.5;">⚠️ Le API key salvate nel browser sono visibili al dispositivo/client e non sono adatte a un ambiente pubblico.</p>
+      <button class="btn btn-primary btn-sm" id="saveAiBtn">${ICONS.check} Salva impostazioni AI</button>
+    </div>
+
+    <div class="card" style="margin-bottom:18px;">
+      <div class="section-title">Database Supabase</div>
+      <p style="font-size:12.5px;color:var(--ink-soft);line-height:1.55;margin-bottom:14px;">GIRLY non richiede account. Inserisci qui URL e publishable/anon key del tuo progetto Supabase. Tutti i dati dell'app verranno salvati online in un unico database condiviso.</p>
+      <div class="field"><label class="field-label">Supabase URL</label><input type="url" id="supabaseUrlInput" value="${escapeHtml(CONFIG.supabaseUrl||'')}" placeholder="https://xxxxxxxx.supabase.co"></div>
+      <div class="field"><label class="field-label">Publishable / anon key</label><input type="password" id="supabaseKeyInput" value="${escapeHtml(CONFIG.supabaseKey||'')}" placeholder="sb_publishable_... oppure anon key"></div>
+      <div id="supabaseStatus" style="font-size:11.5px;color:${supabaseConfigIsValid()?'var(--success)':'var(--ink-faint)'};margin-bottom:12px;">${supabaseConfigIsValid()?'Configurazione presente':'Database non configurato'}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" id="testSupabaseBtn">${ICONS.info} Testa connessione</button>
+        <button class="btn btn-primary btn-sm" id="saveSupabaseBtn">${ICONS.check} Salva e collega</button>
+      </div>
+      <p style="font-size:11px;color:var(--danger);margin-top:12px;line-height:1.5;">Nota: senza autenticazione, chiunque abbia accesso all'URL dell'app può potenzialmente leggere/modificare il database se conosce il progetto. Usa questa modalità solo per un database condiviso controllato.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:18px;">
+      <div class="section-title">Aspetto</div>
+      <div class="seg" id="themeSeg" style="max-width:260px;">
+        <button data-v="light" class="${s.theme!=='dark'?'active':''}">Tema chiaro</button>
+        <button data-v="dark" class="${s.theme==='dark'?'active':''}">Tema scuro</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px;">
+      <div class="section-title">Dati</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" id="exportBtn">${ICONS.download} Esporta dati (JSON)</button>
+        <button class="btn btn-secondary btn-sm" id="importBtn">${ICONS.upload} Importa dati</button>
+        <input type="file" id="importFile" accept="application/json" style="display:none;">
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-danger btn-sm" id="clearAllBtn">${ICONS.trash} Cancella tutti i dati online</button>
+      </div>
+    </div>
+
+    <p style="font-size:11.5px;color:var(--ink-faint);text-align:center;">${escapeHtml(getAppName())} · dati sincronizzati con Supabase.</p>
+  `;
+
+  document.getElementById('saveProfileBtn').addEventListener('click', async ()=>{
+    STATE.profile = STATE.profile || {};
+    STATE.profile.name = document.getElementById('setName').value.trim();
+    STATE.profile.city = document.getElementById('setCity').value.trim();
+    await saveProfile();
+    toast('Profilo aggiornato');
+    renderShell(); renderView();
+  });
+  document.getElementById('saveWeatherBtn').addEventListener('click', async ()=>{
+    STATE.settings.weatherCity = document.getElementById('setWeatherCity').value.trim() || 'Milano';
+    STATE.settings.useGeolocation = false;
+    await saveSettings();
+    await getWeather(true);
+    toast('Città aggiornata');
+    renderView();
+  });
+  document.getElementById('useGeoBtn').addEventListener('click', tryGeolocate);
+  document.getElementById('saveAiBtn').addEventListener('click', async ()=>{
+    STATE.settings.aiEnabled = document.getElementById('aiEnabledToggle').checked;
+    STATE.settings.aiProvider = document.getElementById('aiProviderSelect').value;
+    STATE.settings.aiApiKey = document.getElementById('aiApiKeyInput').value.trim();
+    await saveSettings();
+    toast('Impostazioni AI salvate');
+  });
+  const themeSeg = document.getElementById('themeSeg');
+  themeSeg.querySelectorAll('button').forEach(b=>b.addEventListener('click', async ()=>{
+    STATE.settings.theme = b.getAttribute('data-v');
+    await saveSettings(); applyTheme();
+    themeSeg.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));
+  }));
+  document.getElementById('testSupabaseBtn')?.addEventListener('click', async ()=>{
+    const status = document.getElementById('supabaseStatus');
+    try{
+      saveSupabaseConfig(document.getElementById('supabaseUrlInput').value, document.getElementById('supabaseKeyInput').value);
+      await testSupabaseConnection();
+      status.textContent = 'Connessione Supabase riuscita ✓';
+      status.style.color = 'var(--success)';
+      toast('Connessione Supabase riuscita');
+    }catch(e){
+      status.textContent = `Errore: ${e.message||'connessione non riuscita'}`;
+      status.style.color = 'var(--danger)';
+      toast(`Connessione non riuscita: ${e.message||'errore'}`);
+    }
+  });
+  document.getElementById('saveSupabaseBtn')?.addEventListener('click', async ()=>{
+    try{
+      saveSupabaseConfig(document.getElementById('supabaseUrlInput').value, document.getElementById('supabaseKeyInput').value);
+      if(!supabaseConfigIsValid()) throw new Error('URL o key mancanti.');
+      rebuildSupabaseClient();
+      await testSupabaseConnection();
+      await loadAllData();
+      subscribeToRealtime();
+      applyTheme();
+      renderShell(); renderView();
+      toast('Database Supabase collegato ✓');
+    }catch(e){
+      console.error(e);
+      toast(`Impossibile collegare Supabase: ${e.message||'errore'}`);
+    }
+  });
+  document.getElementById('exportBtn').addEventListener('click', exportAllData);
+  document.getElementById('importBtn').addEventListener('click', ()=>document.getElementById('importFile').click());
+  document.getElementById('importFile').addEventListener('change', handleImportFile);
+  document.getElementById('clearAllBtn').addEventListener('click', ()=>{
+    confirmDialog('Cancellare tutti i dati?', 'Verranno cancellati i dati GIRLY dal database online. L’account di accesso non verrà eliminato.', async ()=>{
+      try{
+        await clearRemoteUserData();
+        const fresh = emptyState();
+        STATE.profile = fresh.profile;
+        STATE.money = fresh.money;
+        STATE.wishlist = [];
+        STATE.wardrobe = [];
+        STATE.outfits = [];
+        STATE.settings = fresh.settings;
+        STATE.weatherCache = null;
+        STATE.todayOutfit = null;
+        toast('Tutti i dati sono stati cancellati');
+        setTimeout(()=>location.reload(), 400);
+      }catch(e){ console.error(e); toast(`Errore: ${e.message||'impossibile cancellare i dati'}`); }
+    }, 'Cancella tutto');
+  });
+}
+
+/* ============================ EXPORT / IMPORT ============================ */
+function exportAllData(){
+  const payload = {
+    profile: STATE.profile, money: STATE.money, wishlist: STATE.wishlist,
+    wardrobe: STATE.wardrobe, outfits: STATE.outfits, settings: STATE.settings,
+    exportedAt: todayISO(), appName: getAppName(),
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${getAppName().toLowerCase()}-backup-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast('Dati esportati ✨');
+}
+function handleImportFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (ev)=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(data.profile) STATE.profile = data.profile;
+      if(data.money) STATE.money = data.money;
+      if(data.wishlist) STATE.wishlist = data.wishlist;
+      if(data.wardrobe) STATE.wardrobe = data.wardrobe;
+      if(data.outfits) STATE.outfits = data.outfits;
+      if(data.settings) STATE.settings = data.settings;
+      await queueStateSave('import');
+      toast('Dati importati con successo ✨');
+      renderShell(); navigate('home');
+    }catch(err){
+      console.error(err);
+      toast('File non valido: impossibile importare');
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ============================ GLOBAL SEARCH ============================ */
+function handleGlobalSearch(query){
+  const q = query.trim().toLowerCase();
+  if(!q) return;
+  const moneyHits = (STATE.money?.categories||[]).filter(c=>c.name.toLowerCase().includes(q));
+  const wishHits = STATE.wishlist.filter(i=>i.name.toLowerCase().includes(q));
+  const wardrobeHits = STATE.wardrobe.filter(i=>i.name.toLowerCase().includes(q) || i.color.toLowerCase().includes(q));
+  const outfitHits = STATE.outfits.filter(o=>o.items.some(i=>i.name.toLowerCase().includes(q)));
+  openGlobalSearchResults(query, { moneyHits, wishHits, wardrobeHits, outfitHits });
+}
+function openGlobalSearchResults(query, hits){
+  const total = hits.moneyHits.length + hits.wishHits.length + hits.wardrobeHits.length + hits.outfitHits.length;
+  openModal(`
+    ${modalHead(`Risultati per "${escapeHtml(query)}"`)}
+    ${total===0 ? `<p style="font-size:13px;color:var(--ink-faint);">Nessun risultato trovato.</p>` : `
+      ${hits.moneyHits.length ? `<div class="section-title" style="font-size:13px;">Cartelle Money</div>${hits.moneyHits.map(c=>`<div style="padding:8px 0;font-size:13px;">${escapeHtml(c.name)} · ${euro(c.amount)}</div>`).join('')}` : ''}
+      ${hits.wishHits.length ? `<div class="section-title" style="font-size:13px;margin-top:14px;">Wishlist</div>${hits.wishHits.map(i=>`<div style="padding:8px 0;font-size:13px;">${escapeHtml(i.name)}</div>`).join('')}` : ''}
+      ${hits.wardrobeHits.length ? `<div class="section-title" style="font-size:13px;margin-top:14px;">Armadio</div>${hits.wardrobeHits.map(i=>`<div style="padding:8px 0;font-size:13px;">${escapeHtml(i.name)}</div>`).join('')}` : ''}
+      ${hits.outfitHits.length ? `<div class="section-title" style="font-size:13px;margin-top:14px;">Outfit salvati</div>${hits.outfitHits.map(o=>`<div style="padding:8px 0;font-size:13px;">${escapeHtml(o.name)}</div>`).join('')}` : ''}
+    `}
+    <div class="modal-foot"><button class="btn btn-secondary" style="flex:1;" onclick="closeModal()">Chiudi</button></div>
+  `);
+}
+
+/* ============================ AUTH ============================ */
+function renderDatabaseNotConfigured(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 20% 20%, var(--blush-100), var(--cream) 60%);">
+      <div class="card" style="max-width:520px;width:100%;padding:34px 28px;text-align:center;">
+        <div class="brand-mark" style="margin:0 auto 18px;width:56px;height:56px;font-size:26px;">G</div>
+        <h2 style="font-size:26px;">Configura GIRLY ✨</h2>
+        <p style="color:var(--ink-faint);font-size:14px;margin-top:10px;line-height:1.6;">Il database Supabase non è ancora configurato. Non serve creare un account: inserisci le credenziali del tuo progetto nella sezione Impostazioni → Database Supabase.</p>
+        <button class="btn btn-primary" id="openDatabaseSettings" style="margin-top:24px;">Apri impostazioni</button>
+      </div>
+    </div>`;
+  document.getElementById('openDatabaseSettings').addEventListener('click', ()=>{
+    STATE.profile = STATE.profile || {name:'',city:''};
+    STATE.settings = STATE.settings || defaultSettings();
+    renderShell();
+    navigate('settings');
+  });
+}
+
+function logout(){}
+
+/* ============================ ONBOARDING ============================ */
+function isOnboardingCompleted(){ return !!STATE.profile?.onboardingCompleted; }
+function markOnboardingCompleted(){ if(STATE.profile) STATE.profile.onboardingCompleted = true; }
+
+function runOnboarding(){
+  let step = 1;
+  const draft = { name:'', city:'Milano', wantsWeather:true, initialBalance:'' };
+
+  function render(){
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 20% 20%, var(--blush-100), var(--cream) 60%);">
+        <div class="card" style="max-width:420px;width:100%;padding:36px 28px;">
+          ${onboardingStepHtml()}
+        </div>
+      </div>`;
+    bindOnboardingEvents();
+  }
+
+  function onboardingStepHtml(){
+    if(step===0){
+      return `
+        <div style="text-align:center;">
+          <div class="brand-mark" style="margin:0 auto 18px auto;width:56px;height:56px;font-size:26px;">${getAppName().slice(0,1)}</div>
+          <h2 style="font-size:26px;">Benvenuta ✨</h2>
+          <p style="color:var(--ink-faint);font-size:14px;margin-top:10px;line-height:1.6;">Il tuo spazio personale per soldi, desideri e stile.</p>
+          <button class="btn btn-primary" id="obStart" style="width:100%;margin-top:26px;">Inizia ${ICONS.arrowRight}</button>
+        </div>`;
+    }
+    if(step===1){
+      return `
+        <h2 style="font-size:21px;margin-bottom:6px;">Come ti chiami?</h2>
+        <p style="font-size:13px;color:var(--ink-faint);margin-bottom:18px;">Useremo il tuo nome per darti il benvenuto ogni volta.</p>
+        <div class="field"><input type="text" id="obName" placeholder="Il tuo nome" value="${escapeHtml(draft.name)}"></div>
+        <button class="btn btn-primary" id="obNext1" style="width:100%;margin-top:10px;">Continua ${ICONS.arrowRight}</button>`;
+    }
+    if(step===2){
+      return `
+        <h2 style="font-size:21px;margin-bottom:6px;">In che città sei?</h2>
+        <p style="font-size:13px;color:var(--ink-faint);margin-bottom:18px;">Ci servirà per suggerirti gli outfit giusti in base al meteo.</p>
+        <div class="field"><input type="text" id="obCity" value="${escapeHtml(draft.city)}"></div>
+        <button class="btn btn-primary" id="obNext2" style="width:100%;margin-top:10px;">Continua ${ICONS.arrowRight}</button>`;
+    }
+    if(step===3){
+      return `
+        <h2 style="font-size:21px;margin-bottom:6px;">Vuoi attivare il meteo?</h2>
+        <p style="font-size:13px;color:var(--ink-faint);margin-bottom:18px;">Ti aiuterà a generare outfit più precisi.</p>
+        <div class="seg" style="margin-bottom:18px;">
+          <button data-v="yes" class="${draft.wantsWeather?'active':''}" id="obWeatherYes">Sì</button>
+          <button data-v="no" class="${!draft.wantsWeather?'active':''}" id="obWeatherNo">No</button>
+        </div>
+        <button class="btn btn-primary" id="obNext3" style="width:100%;">Continua ${ICONS.arrowRight}</button>`;
+    }
+    if(step===4){
+      return `
+        <h2 style="font-size:21px;margin-bottom:6px;">Il tuo saldo iniziale</h2>
+        <p style="font-size:13px;color:var(--ink-faint);margin-bottom:18px;">Facoltativo: puoi aggiungerlo in qualsiasi momento.</p>
+        <div class="field"><input type="number" id="obBalance" placeholder="0,00" step="0.01" min="0" value="${draft.initialBalance}"></div>
+        <button class="btn btn-primary" id="obFinish" style="width:100%;margin-top:10px;">Costruiamo il tuo mondo ✨</button>`;
+    }
+  }
+
+  function bindOnboardingEvents(){
+    document.getElementById('obStart')?.addEventListener('click', ()=>{ step=1; render(); });
+    document.getElementById('obNext1')?.addEventListener('click', ()=>{
+      draft.name = document.getElementById('obName').value.trim();
+      step=2; render();
+    });
+    document.getElementById('obNext2')?.addEventListener('click', ()=>{
+      draft.city = document.getElementById('obCity').value.trim() || 'Milano';
+      step=3; render();
+    });
+    document.getElementById('obWeatherYes')?.addEventListener('click', ()=>{ draft.wantsWeather=true; render(); });
+    document.getElementById('obWeatherNo')?.addEventListener('click', ()=>{ draft.wantsWeather=false; render(); });
+    document.getElementById('obNext3')?.addEventListener('click', ()=>{ step=4; render(); });
+    document.getElementById('obFinish')?.addEventListener('click', ()=>{
+      draft.initialBalance = document.getElementById('obBalance').value;
+      finishOnboarding();
+    });
+  }
+
+  async function finishOnboarding(){
+    try{
+      STATE.profile = { name: draft.name || 'Ospite', city: draft.city, onboardingCompleted:true };
+      STATE.settings = { ...defaultSettings(), weatherCity: draft.city, weatherDisabled: draft.wantsWeather === false };
+      ensureMoney();
+      const initial = parseFloat(draft.initialBalance);
+      if(initial && initial > 0){
+        STATE.money.unallocated += initial;
+        STATE.money.total += initial;
+        STATE.money.transactions.push({ id:uid('tx'), type:'income', amount:initial, categoryId:null, description:'Saldo iniziale', date: todayISO() });
+      }
+      markOnboardingCompleted();
+      await queueStateSave('onboarding');
+      bootApp();
+    }catch(e){ console.error(e); toast(`Errore salvataggio: ${e.message||'impossibile completare la configurazione'}`); }
+  }
+
+  render();
+}
+
+/* ============================ BOOT ============================ */
+function bootApp(){
+  if(!STATE.settings) STATE.settings = defaultSettings();
+  applyThemeEarly();
+  renderShell();
+  applyTheme();
+  navigate('home');
+}
+function applyThemeEarly(){
+  document.body.classList.toggle('theme-dark', STATE.settings?.theme === 'dark');
+}
+
+(async function init(){
+  try{
+    if(!supabaseConfigIsValid()){
+      const localFresh = emptyState();
+      STATE.settings = localFresh.settings;
+      STATE.profile = localFresh.profile;
+      STATE.money = localFresh.money;
+      STATE.wishlist = [];
+      STATE.wardrobe = [];
+      STATE.outfits = [];
+      STATE.weatherCache = null;
+      renderDatabaseNotConfigured();
+      return;
+    }
+    rebuildSupabaseClient();
+    await testSupabaseConnection();
+    await loadAllData();
+    subscribeToRealtime();
+    if(!STATE.profile?.onboardingCompleted){ runOnboarding(); }
+    else { bootApp(); }
+  }catch(e){
+    console.error('GIRLY init error', e);
+    renderDatabaseNotConfigured();
+    toast(`Supabase non disponibile: ${e.message||'errore di connessione'}`);
+  }
+})();
+</script>
+</body>
+</html>
