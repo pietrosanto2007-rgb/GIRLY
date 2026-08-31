@@ -518,6 +518,14 @@ pre,code{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere;}
   .modal [style*="grid-template-columns:repeat(2,minmax(0,1fr))"]{grid-template-columns:1fr !important;}
 }
 
+.money-value{display:inline-block;white-space:nowrap;word-break:keep-all;}
+.money-head-actions{display:flex;gap:10px;flex-wrap:wrap;min-width:0;}
+@media(max-width:719px){
+  .money-head-actions{width:100%;}
+  .money-head-actions .btn{flex:1 1 140px;min-width:0;}
+  .card [style*="font-size:52px"],.card [style*="font-size:38px"]{white-space:nowrap;overflow-wrap:normal;}
+}
+
 /* Modali Money/Wishlist: la geometria resta ancorata all’asse X anche quando si apre la tastiera. */
 .overlay,.modal{
   max-width:100%;
@@ -1039,8 +1047,26 @@ function ensureMoney(){
 function moneyUnallocated(){ return STATE.money.unallocated; }
 function moneyCategoryById(id){ return STATE.money.categories.find(c=>c.id===id); }
 function recalcTotal(){
-  const allocated = STATE.money.categories.reduce((s,c)=>s + c.amount, 0);
+  const allocated = STATE.money.categories.reduce((s,c) => s + c.amount, 0);
   STATE.money.total = allocated + STATE.money.unallocated;
+}
+
+/* Riduce il totale disponibile in modo consistente, partendo dai non assegnati e poi dalle cartelle. */
+function reduceMoneyBalance(amount){
+  let remaining = Number(amount) || 0;
+  if(remaining <= 0 || remaining > STATE.money.total) return false;
+  const fromUnallocated = Math.min(STATE.money.unallocated, remaining);
+  STATE.money.unallocated -= fromUnallocated;
+  remaining -= fromUnallocated;
+  for(let i=STATE.money.categories.length-1; i>=0 && remaining>0; i--){
+    const category = STATE.money.categories[i];
+    const fromCategory = Math.min(category.amount, remaining);
+    category.amount -= fromCategory;
+    remaining -= fromCategory;
+  }
+  if(remaining > 0) return false;
+  recalcTotal();
+  return true;
 }
 
 function renderMoney(root){
@@ -1054,7 +1080,10 @@ function renderMoney(root){
         <h1 class="page-title">Money</h1>
         <p class="page-sub">Gestisci i tuoi soldi, in cartelle chiare.</p>
       </div>
-      <button class="btn btn-secondary btn-sm" id="btnAddBalance">${ICONS.plus} Aggiungi saldo</button>
+      <div class="money-head-actions">
+        <button class="btn btn-secondary btn-sm" id="btnAddBalance">${ICONS.plus} Aggiungi saldo</button>
+        <button class="btn btn-danger btn-sm" id="btnRemoveBalance">− Riduci saldo</button>
+      </div>
     </div>
 
     ${!hasData ? `
@@ -1101,6 +1130,7 @@ function renderMoney(root){
   `;
 
   document.getElementById('btnAddBalance')?.addEventListener('click', openAddBalanceModal);
+  document.getElementById('btnRemoveBalance')?.addEventListener('click', openRemoveBalanceModal);
   document.getElementById('emptyAddBalance')?.addEventListener('click', openAddBalanceModal);
   document.getElementById('addFolderCard')?.addEventListener('click', ()=>openFolderModal());
   root.querySelectorAll('.folder-card').forEach(card=>{
@@ -1196,39 +1226,54 @@ function renderMoneyCharts(m){
   `;
 }
 
-function openAddBalanceModal(){
+function openBalanceModal(mode='add'){
   ensureMoney();
+  const isRemoval = mode === 'remove';
+  const title = isRemoval ? 'Riduci saldo' : 'Aggiungi saldo';
+  const description = isRemoval
+    ? 'L’importo verrà sottratto dal totale disponibile e registrato nello storico come spesa.'
+    : 'Questo importo aumenta il totale disponibile ed entra nei "Non assegnati", finché non lo sposti in una cartella.';
   openModal(`
-    ${modalHead('Aggiungi saldo')}
-    <p style="font-size:13px;color:var(--ink-faint);margin-bottom:16px;line-height:1.5;">Questo importo va ad aumentare il totale disponibile ed entra nei "Non assegnati", finché non lo sposti in una cartella.</p>
+    ${modalHead(title)}
+    <p style="font-size:13px;color:var(--ink-faint);margin-bottom:16px;line-height:1.5;">${description}</p>
     <div class="field">
       <label class="field-label">Importo</label>
-      <input type="number" id="balanceAmount" placeholder="0,00" step="0.01" min="0">
+      <input type="number" id="balanceAmount" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" placeholder="0,00" step="0.01" min="0" max="${isRemoval ? Math.max(0, STATE.money.total) : ''}">
     </div>
     <div class="field">
-      <label class="field-label">Descrizione (opzionale)</label>
-      <input type="text" id="balanceDesc" placeholder="Es. Stipendio, regalo...">
+      <label class="field-label">Descrizione ${isRemoval ? '(obbligatoria)' : '(opzionale)'}</label>
+      <input type="text" id="balanceDesc" placeholder="${isRemoval ? 'Es. Spesa alimentare, acquisto...' : 'Es. Stipendio, regalo...'}" ${isRemoval ? 'required' : ''}>
     </div>
     <div class="modal-foot">
       <button class="btn btn-secondary" onclick="closeModal()">Annulla</button>
-      <button class="btn btn-primary" id="confirmBalance">${ICONS.check} Aggiungi</button>
+      <button class="btn ${isRemoval ? 'btn-danger' : 'btn-primary'}" id="confirmBalance">${isRemoval ? '−' : ICONS.check} ${isRemoval ? 'Riduci saldo' : 'Aggiungi'}</button>
     </div>
   `, { onMount:(overlay)=>{
-    overlay.querySelector('#balanceAmount').focus();
+    const amountInput = overlay.querySelector('#balanceAmount');
+    amountInput.focus();
     overlay.querySelector('#confirmBalance').addEventListener('click', ()=>{
-      const amount = parseFloat(overlay.querySelector('#balanceAmount').value);
+      const amount = parseFloat(String(amountInput.value).replace(',', '.'));
       const desc = overlay.querySelector('#balanceDesc').value.trim();
       if(!amount || amount <= 0){ toast('Inserisci un importo valido'); return; }
-      STATE.money.unallocated += amount;
-      recalcTotal();
-      STATE.money.transactions.push({ id:uid('tx'), type:'income', amount, categoryId:null, description: desc || 'Saldo aggiunto', date: todayISO() });
+      if(isRemoval){
+        if(amount > STATE.money.total){ toast(`Importo superiore al saldo disponibile (${euro(STATE.money.total)})`); return; }
+        if(!desc){ toast('Inserisci una descrizione della spesa'); overlay.querySelector('#balanceDesc').focus(); return; }
+        if(!reduceMoneyBalance(amount)) return;
+        STATE.money.transactions.push({ id:uid('tx'), type:'expense', amount, categoryId:null, description:desc, date:todayISO() });
+      } else {
+        STATE.money.unallocated += amount;
+        recalcTotal();
+        STATE.money.transactions.push({ id:uid('tx'), type:'income', amount, categoryId:null, description:desc || 'Saldo aggiunto', date:todayISO() });
+      }
       saveMoney();
       closeModal();
-      toast(`${euro(amount)} aggiunti al totale ✨`);
+      toast(isRemoval ? `${euro(amount)} registrati come spesa` : `${euro(amount)} aggiunti al totale ✨`);
       renderView();
     });
   }});
 }
+function openAddBalanceModal(){ openBalanceModal('add'); }
+function openRemoveBalanceModal(){ openBalanceModal('remove'); }
 
 function openFolderModal(existing){
   const isEdit = !!existing;
@@ -1258,7 +1303,7 @@ function openFolderModal(existing){
     </div>
     ${!isEdit ? `<div class="field">
       <label class="field-label">Importo iniziale (opzionale)</label>
-      <input type="number" id="folderInitial" placeholder="0,00" step="0.01" min="0">
+      <input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="folderInitial" placeholder="0,00" step="0.01" min="0">
       <p style="font-size:11.5px;color:var(--ink-faint);margin-top:6px;">Sposta questo importo dai "Non assegnati" (${euro(moneyUnallocated())} disponibili).</p>
     </div>` : ''}
     <div class="modal-foot">
@@ -1365,7 +1410,7 @@ function openFolderAdjustModal(cat, mode){
     ${modalHead(isAdd ? `Aggiungi a ${cat.name}` : `Rimuovi da ${cat.name}`)}
     <div class="field">
       <label class="field-label">Importo</label>
-      <input type="number" id="adjAmount" placeholder="0,00" step="0.01" min="0">
+      <input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="adjAmount" placeholder="0,00" step="0.01" min="0">
     </div>
     <div class="field">
       <label class="field-label">Descrizione</label>
@@ -1415,7 +1460,7 @@ function openTransferModal(fromCat){
     </div>
     <div class="field">
       <label class="field-label">Importo</label>
-      <input type="number" id="transferAmount" step="0.01" min="0" placeholder="0,00">
+      <input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="transferAmount" step="0.01" min="0" placeholder="0,00">
       <p style="font-size:11.5px;color:var(--ink-faint);margin-top:6px;">Disponibile: ${euro(fromCat.amount)}</p>
     </div>
     <div class="modal-foot">
@@ -1467,7 +1512,7 @@ function openAddTransactionModal(){
     </div>
     <div class="field">
       <label class="field-label">Importo</label>
-      <input type="number" id="txAmount" placeholder="0,00" step="0.01" min="0">
+      <input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="txAmount" placeholder="0,00" step="0.01" min="0">
     </div>
     <div class="field" id="txCategoryField">
       <label class="field-label">Cartella</label>
@@ -1602,7 +1647,7 @@ function renderWishlist(root){
           <div style="font-size:11.5px;color:var(--ink-faint);">acquistati</div>
         </div>
         <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
-          <div style="font-family:var(--font-display);font-size:24px;font-weight:600;">${euro(estValue)}</div>
+          <div class="money-value" style="font-family:var(--font-display);font-size:24px;font-weight:600;">${euro(estValue)}</div>
           <div style="font-size:11.5px;color:var(--ink-faint);">valore stimato</div>
         </div>
       </div>
@@ -1745,7 +1790,7 @@ function openWishlistItemModal(existing){
     <div class="field-row">
       <div class="field">
         <label class="field-label">Prezzo (opzionale)</label>
-        <input type="number" id="wPrice" step="0.01" min="0" value="${existing?.price||''}" placeholder="0,00">
+        <input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="wPrice" step="0.01" min="0" value="${existing?.price||''}" placeholder="0,00">
       </div>
       <div class="field">
         <label class="field-label">Priorità</label>
@@ -2003,11 +2048,11 @@ function openWardrobeItemModal(existing){
     <div class="field-row">
       <div class="field">
         <label class="field-label">Temp. minima consigliata (°C)</label>
-        <input type="number" id="gMinTemp" value="${existing?.minTemp ?? ''}" placeholder="Es. 15">
+        <input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="gMinTemp" value="${existing?.minTemp ?? ''}" placeholder="Es. 15">
       </div>
       <div class="field">
         <label class="field-label">Temp. massima consigliata (°C)</label>
-        <input type="number" id="gMaxTemp" value="${existing?.maxTemp ?? ''}" placeholder="Es. 28">
+        <input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="gMaxTemp" value="${existing?.maxTemp ?? ''}" placeholder="Es. 28">
       </div>
     </div>
     <div class="field">
@@ -3206,7 +3251,7 @@ function runOnboarding(){
       return `
         <h2 style="font-size:21px;margin-bottom:6px;">Il tuo saldo iniziale</h2>
         <p style="font-size:13px;color:var(--ink-faint);margin-bottom:18px;">Facoltativo: puoi aggiungerlo in qualsiasi momento.</p>
-        <div class="field"><input type="number" id="obBalance" placeholder="0,00" step="0.01" min="0" value="${draft.initialBalance}"></div>
+        <div class="field"><input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="obBalance" placeholder="0,00" step="0.01" min="0" value="${draft.initialBalance}"></div>
         <button class="btn btn-primary" id="obFinish" style="width:100%;margin-top:10px;">Costruiamo il tuo mondo ✨</button>`;
     }
   }
@@ -3282,32 +3327,38 @@ const MobileInputViewport = (() => {
     document.body.classList.toggle('keyboard-open', keyboardOpen);
   }
 
+  function lockHorizontalAxis(){
+    if(window.scrollX !== 0) window.scrollTo({left:0, top:window.scrollY, behavior:'auto'});
+    if(document.documentElement.scrollLeft !== 0) document.documentElement.scrollLeft = 0;
+    if(document.body.scrollLeft !== 0) document.body.scrollLeft = 0;
+    document.querySelectorAll('.overlay,.modal,.view').forEach(node=>{
+      if(node.scrollLeft !== 0) node.scrollLeft = 0;
+    });
+  }
+
   function keepFocusedElementVisible(){
     if(!isEditable(activeElement) || !document.contains(activeElement)) return;
     const { height, top } = getViewportMetrics();
     const rect = activeElement.getBoundingClientRect();
     const safeTop = top + 20;
     const safeBottom = top + height - Math.min(132, Math.max(72, height * .18));
+    const delta = rect.top < safeTop ? rect.top - safeTop : rect.bottom > safeBottom ? rect.bottom - safeBottom : 0;
+    if(!delta) return;
 
-    if(rect.top < safeTop || rect.bottom > safeBottom){
-      /* scrollIntoView può modificare anche scrollLeft in Safari/iOS: lo preserviamo. */
-      const pageX = window.scrollX;
-      const horizontalParents = [];
-      let parent = activeElement.parentElement;
-      while(parent && parent !== document.body){
-        const style = getComputedStyle(parent);
-        const canScrollX = parent.scrollWidth > parent.clientWidth && /(auto|scroll|overlay|clip)/.test(style.overflowX);
-        if(canScrollX) horizontalParents.push({node:parent,left:parent.scrollLeft});
-        parent = parent.parentElement;
+    /* Scorri solo in verticale il contenitore corretto, senza usare scrollIntoView. */
+    let parent = activeElement.parentElement;
+    while(parent && parent !== document.body){
+      const style = getComputedStyle(parent);
+      const canScrollY = parent.scrollHeight > parent.clientHeight && /(auto|scroll|overlay)/.test(style.overflowY);
+      if(canScrollY){
+        parent.scrollTop += delta;
+        lockHorizontalAxis();
+        return;
       }
-      activeElement.scrollIntoView({
-        block:'center',
-        inline:'nearest',
-        behavior:reducedMotion ? 'auto' : 'smooth'
-      });
-      window.scrollTo({left:pageX, top:window.scrollY, behavior:'auto'});
-      horizontalParents.forEach(({node,left})=>{ node.scrollLeft = left; });
+      parent = parent.parentElement;
     }
+    window.scrollBy({top:delta, left:0, behavior:reducedMotion ? 'auto' : 'smooth'});
+    lockHorizontalAxis();
   }
 
   function scheduleVisibilityCheck(delay = 0){
@@ -3350,10 +3401,11 @@ const MobileInputViewport = (() => {
 
   const visualViewport = window.visualViewport;
   if(visualViewport){
-    visualViewport.addEventListener('resize', () => scheduleVisibilityCheck());
-    visualViewport.addEventListener('scroll', updateViewport);
+    visualViewport.addEventListener('resize', () => { lockHorizontalAxis(); scheduleVisibilityCheck(); });
+    visualViewport.addEventListener('scroll', () => { lockHorizontalAxis(); updateViewport(); });
   }
-  window.addEventListener('resize', () => scheduleVisibilityCheck());
+  window.addEventListener('scroll', lockHorizontalAxis, { passive:true });
+  window.addEventListener('resize', () => { lockHorizontalAxis(); scheduleVisibilityCheck(); });
   window.addEventListener('orientationchange', () => {
     window.setTimeout(() => {
       const { height, top } = getViewportMetrics();
