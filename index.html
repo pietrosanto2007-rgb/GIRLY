@@ -517,6 +517,19 @@ pre,code{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere;}
   .wish-row > div:nth-child(2){width:40px;height:40px;}
   .modal [style*="grid-template-columns:repeat(2,minmax(0,1fr))"]{grid-template-columns:1fr !important;}
 }
+
+/* Modali Money/Wishlist: la geometria resta ancorata all’asse X anche quando si apre la tastiera. */
+.overlay,.modal{
+  max-width:100%;
+  overflow-x:clip;
+}
+.modal > *, .modal input, .modal textarea, .modal select, .modal button{max-width:100%;}
+.modal .seg{width:100%;min-width:0;}
+.modal .seg button{min-width:0;overflow-wrap:anywhere;}
+@media(max-width:719px){
+  .overlay{left:0;right:0;transform:none !important;}
+  .modal{margin-left:0;margin-right:0;transform:translate3d(0,0,0);}
+}
 </style>
 </head>
 <body>
@@ -3277,11 +3290,23 @@ const MobileInputViewport = (() => {
     const safeBottom = top + height - Math.min(132, Math.max(72, height * .18));
 
     if(rect.top < safeTop || rect.bottom > safeBottom){
+      /* scrollIntoView può modificare anche scrollLeft in Safari/iOS: lo preserviamo. */
+      const pageX = window.scrollX;
+      const horizontalParents = [];
+      let parent = activeElement.parentElement;
+      while(parent && parent !== document.body){
+        const style = getComputedStyle(parent);
+        const canScrollX = parent.scrollWidth > parent.clientWidth && /(auto|scroll|overlay|clip)/.test(style.overflowX);
+        if(canScrollX) horizontalParents.push({node:parent,left:parent.scrollLeft});
+        parent = parent.parentElement;
+      }
       activeElement.scrollIntoView({
         block:'center',
         inline:'nearest',
         behavior:reducedMotion ? 'auto' : 'smooth'
       });
+      window.scrollTo({left:pageX, top:window.scrollY, behavior:'auto'});
+      horizontalParents.forEach(({node,left})=>{ node.scrollLeft = left; });
     }
   }
 
