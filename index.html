@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="GIRLY">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>GIRLY</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,6 +48,8 @@
   --font-body: 'DM Sans', sans-serif;
   --sidebar-w: 248px;
   --header-h: 0px;
+  --app-visual-height: 100vh;
+  --keyboard-offset: 0px;
 }
 
 *,*::before,*::after{box-sizing:border-box;}
@@ -384,6 +386,62 @@ body.theme-dark{
 }
 body.theme-dark .search-wrap,body.theme-dark .field input,body.theme-dark .field select,body.theme-dark .field textarea{background:var(--blush-50);}
 body.theme-dark .topbar{background:rgba(33,28,30,.86);}
+
+/* ---- Gestione globale viewport mobile, tastiera e zoom ---- */
+@supports (height: 100dvh){
+  :root{--app-visual-height:100dvh;}
+}
+html{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  touch-action:pan-x pan-y;
+}
+body{
+  min-height:var(--app-visual-height);
+  overscroll-behavior-x:none;
+}
+#app{min-height:var(--app-visual-height);}
+.sidebar{height:var(--app-visual-height);}
+.view{padding-bottom:calc(100px + var(--keyboard-offset));}
+
+/* La dimensione dell'overlay segue la visual viewport: le modali restano sopra la tastiera. */
+.overlay{
+  inset:0 auto auto 0;
+  width:100%;
+  height:var(--app-visual-height);
+  min-height:var(--app-visual-height);
+}
+.modal{
+  max-height:calc(var(--app-visual-height) - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overscroll-behavior:contain;
+  scroll-padding:24px 0 calc(32px + var(--keyboard-offset)) 0;
+}
+:where(input, textarea, select, [contenteditable]:not([contenteditable="false"])){
+  scroll-margin-top:24px;
+  scroll-margin-bottom:calc(132px + var(--keyboard-offset));
+}
+
+/* Gli elementi fissi si sollevano con la tastiera e non possono essere coperti dai contenuti ordinari. */
+.bottom-nav{bottom:var(--keyboard-offset);}
+.toast-stack{bottom:calc(28px + var(--keyboard-offset));}
+.fab{
+  right:calc(28px + env(safe-area-inset-right));
+  bottom:calc(28px + env(safe-area-inset-bottom) + var(--keyboard-offset));
+  z-index:80 !important;
+  isolation:isolate;
+}
+@media(max-width:719px){
+  .view{padding-bottom:calc(100px + var(--keyboard-offset));}
+  .fab{
+    right:calc(18px + env(safe-area-inset-right));
+    bottom:calc(86px + env(safe-area-inset-bottom) + var(--keyboard-offset));
+  }
+  /* Evita lo zoom automatico di Safari al focus dei campi. */
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select,
+  [contenteditable]:not([contenteditable="false"]){font-size:16px !important;}
+}
 </style>
 </head>
 <body>
@@ -3103,6 +3161,120 @@ function runOnboarding(){
 
   render();
 }
+
+/* ============================ GLOBAL MOBILE INPUT / VIEWPORT ============================ */
+/* Gestore delegato: copre automaticamente le viste e le modali presenti o future. */
+const MobileInputViewport = (() => {
+  const editableSelector = 'input:not([type="hidden"]):not([disabled]):not([readonly]), textarea:not([disabled]):not([readonly]), select:not([disabled]), [contenteditable]:not([contenteditable="false"])';
+  const root = document.documentElement;
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  let activeElement = null;
+  let animationFrame = 0;
+  let stableViewportHeight = Math.max(window.innerHeight, window.visualViewport?.height || 0);
+
+  function isEditable(node){
+    return node instanceof Element && node.matches(editableSelector) && node.getClientRects().length > 0;
+  }
+
+  function getViewportMetrics(){
+    const vv = window.visualViewport;
+    const height = Math.round(vv?.height || window.innerHeight);
+    const top = Math.max(0, Math.round(vv?.offsetTop || 0));
+    return { height, top };
+  }
+
+  function updateViewport(){
+    const { height, top } = getViewportMetrics();
+    if(!activeElement) stableViewportHeight = Math.max(stableViewportHeight, height + top, window.innerHeight);
+    const coveredHeight = Math.max(0, stableViewportHeight - height - top);
+    const keyboardOpen = !!activeElement && coveredHeight > Math.max(120, stableViewportHeight * .15);
+
+    root.style.setProperty('--app-visual-height', `${height}px`);
+    root.style.setProperty('--keyboard-offset', `${keyboardOpen ? Math.round(coveredHeight) : 0}px`);
+    document.body.classList.toggle('keyboard-open', keyboardOpen);
+  }
+
+  function keepFocusedElementVisible(){
+    if(!isEditable(activeElement) || !document.contains(activeElement)) return;
+    const { height, top } = getViewportMetrics();
+    const rect = activeElement.getBoundingClientRect();
+    const safeTop = top + 20;
+    const safeBottom = top + height - Math.min(132, Math.max(72, height * .18));
+
+    if(rect.top < safeTop || rect.bottom > safeBottom){
+      activeElement.scrollIntoView({
+        block:'center',
+        inline:'nearest',
+        behavior:reducedMotion ? 'auto' : 'smooth'
+      });
+    }
+  }
+
+  function scheduleVisibilityCheck(delay = 0){
+    const run = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => {
+        updateViewport();
+        keepFocusedElementVisible();
+      });
+    };
+    if(delay) window.setTimeout(run, delay);
+    else run();
+  }
+
+  document.addEventListener('focusin', (event) => {
+    if(!isEditable(event.target)) return;
+    activeElement = event.target;
+    scheduleVisibilityCheck();
+    /* iOS e Android aggiornano la visual viewport con tempistiche differenti. */
+    scheduleVisibilityCheck(80);
+    scheduleVisibilityCheck(320);
+  }, true);
+
+  document.addEventListener('focusout', () => {
+    window.setTimeout(() => {
+      const nextFocused = document.activeElement;
+      if(isEditable(nextFocused)){
+        activeElement = nextFocused;
+        scheduleVisibilityCheck();
+        return;
+      }
+      activeElement = null;
+      updateViewport();
+    }, 0);
+  }, true);
+
+  document.addEventListener('input', (event) => {
+    if(event.target === activeElement) scheduleVisibilityCheck();
+  }, true);
+
+  const visualViewport = window.visualViewport;
+  if(visualViewport){
+    visualViewport.addEventListener('resize', () => scheduleVisibilityCheck());
+    visualViewport.addEventListener('scroll', updateViewport);
+  }
+  window.addEventListener('resize', () => scheduleVisibilityCheck());
+  window.addEventListener('orientationchange', () => {
+    window.setTimeout(() => {
+      const { height, top } = getViewportMetrics();
+      stableViewportHeight = Math.max(window.innerHeight, height + top);
+      scheduleVisibilityCheck();
+    }, 180);
+  });
+
+  /* Difese aggiuntive per browser mobili che ignorano user-scalable=no. */
+  const preventGestureZoom = (event) => event.preventDefault();
+  document.addEventListener('gesturestart', preventGestureZoom, { passive:false });
+  document.addEventListener('gesturechange', preventGestureZoom, { passive:false });
+  document.addEventListener('gestureend', preventGestureZoom, { passive:false });
+  document.addEventListener('touchmove', (event) => {
+    if(event.touches.length > 1) event.preventDefault();
+  }, { passive:false });
+  document.addEventListener('dblclick', preventGestureZoom, { passive:false });
+
+  updateViewport();
+  return { refresh:scheduleVisibilityCheck };
+})();
 
 /* ============================ BOOT ============================ */
 function bootApp(){
