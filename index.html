@@ -518,7 +518,16 @@ pre,code{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere;}
   .modal [style*="grid-template-columns:repeat(2,minmax(0,1fr))"]{grid-template-columns:1fr !important;}
 }
 
-.money-value{display:inline-block;white-space:nowrap;word-break:keep-all;}
+.money-value{display:inline-block;white-space:nowrap;word-break:keep-all;max-width:100%;}
+.wishlist-stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:22px;min-width:0;width:100%;}
+.wishlist-stat-card{min-width:0 !important;width:100%;padding:16px;text-align:center;overflow:hidden;}
+.wishlist-stat-value{font-family:var(--font-display);font-size:clamp(17px,2.1vw,24px);font-weight:600;line-height:1.1;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.wishlist-stat-label{font-size:11.5px;color:var(--ink-faint);line-height:1.25;overflow-wrap:anywhere;}
+@media(max-width:719px){
+  .wishlist-stats-grid{gap:8px;}
+  .wishlist-stat-card{padding:14px 8px;}
+  .wishlist-stat-value{font-size:clamp(16px,5vw,22px);letter-spacing:-.035em;}
+}
 .money-head-actions{display:flex;gap:10px;flex-wrap:wrap;min-width:0;}
 @media(max-width:719px){
   .money-head-actions{width:100%;}
@@ -1637,18 +1646,18 @@ function renderWishlist(root){
         <button class="btn btn-primary" id="emptyAddWish">${ICONS.plus} Aggiungi</button>
       </div>
     ` : `
-      <div style="display:flex;gap:22px;margin-bottom:22px;flex-wrap:wrap;">
-        <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
-          <div style="font-family:var(--font-display);font-size:24px;font-weight:600;">${total}</div>
-          <div style="font-size:11.5px;color:var(--ink-faint);">nella wishlist</div>
+      <div class="wishlist-stats-grid">
+        <div class="card wishlist-stat-card">
+          <div class="wishlist-stat-value">${total}</div>
+          <div class="wishlist-stat-label">nella wishlist</div>
         </div>
-        <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
-          <div style="font-family:var(--font-display);font-size:24px;font-weight:600;">${purchased}</div>
-          <div style="font-size:11.5px;color:var(--ink-faint);">acquistati</div>
+        <div class="card wishlist-stat-card">
+          <div class="wishlist-stat-value">${purchased}</div>
+          <div class="wishlist-stat-label">acquistati</div>
         </div>
-        <div class="card" style="flex:1;min-width:140px;text-align:center;padding:16px;">
-          <div class="money-value" style="font-family:var(--font-display);font-size:24px;font-weight:600;">${euro(estValue)}</div>
-          <div style="font-size:11.5px;color:var(--ink-faint);">valore stimato</div>
+        <div class="card wishlist-stat-card">
+          <div class="wishlist-stat-value money-value">${euro(estValue)}</div>
+          <div class="wishlist-stat-label">valore stimato</div>
         </div>
       </div>
 
