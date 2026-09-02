@@ -2011,17 +2011,22 @@ function openWardrobeItemModal(existing){
   let color = existing?.color || WARDROBE_COLORS[0];
   let seasons = existing?.season ? [...existing.season] : [];
   let style = existing?.style || WARDROBE_STYLES[0];
-  let imageData = null; // dataURL preview, persisted in Supabase
+  let imageData = null; // dataURL nuova foto selezionata, persistita in Supabase
   let existingImageRef = existing?.imageData || existing?.image || null;
+  let imageRemoved = false;
 
   openModal(`
     ${modalHead(isEdit ? 'Modifica capo' : 'Nuovo capo')}
     <div class="field">
       <label class="field-label">Foto</label>
-      <div class="upload-box" id="gImageBox" style="aspect-ratio:4/3;">
-        ${ICONS.camera}<span>Carica o scatta una foto</span>
+      <div class="upload-box" id="gImageBox" style="aspect-ratio:4/3;min-height:220px;">
+        ${ICONS.camera}<span id="gImagePlaceholder">Carica o scatta una foto</span>
       </div>
-      <input type="file" id="gImageInput" accept="image/*" capture="environment" style="display:none;">
+      <div id="gImageActions" style="display:flex;gap:8px;margin-top:8px;">
+        <button type="button" class="btn btn-secondary btn-sm" id="gChooseImageBtn" style="flex:1;">${ICONS.image} Scegli foto</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="gClearImageBtn" style="display:none;">${ICONS.trash} Rimuovi</button>
+      </div>
+      <input type="file" id="gImageInput" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif" capture="environment" style="display:none;">
     </div>
     <div class="field">
       <label class="field-label">Nome</label>
@@ -2088,16 +2093,54 @@ function openWardrobeItemModal(existing){
   `, { onMount: async (overlay)=>{
     const imgBox = overlay.querySelector('#gImageBox');
     const imgInput = overlay.querySelector('#gImageInput');
-    if(existingImageRef){
-      const existingImg = existingImageRef;
-      if(existingImg) imgBox.innerHTML = `<img src="${existingImg}">`;
-    }
+    const chooseImageBtn = overlay.querySelector('#gChooseImageBtn');
+    const clearImageBtn = overlay.querySelector('#gClearImageBtn');
+
+    const renderImagePreview = (src)=>{
+      if(!src){
+        imgBox.innerHTML = `${ICONS.camera}<span id="gImagePlaceholder">Carica o scatta una foto</span>`;
+        clearImageBtn.style.display = 'none';
+        return;
+      }
+      imgBox.innerHTML = `<img src="${src}" alt="Anteprima del capo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">`;
+      clearImageBtn.style.display = 'inline-flex';
+    };
+
+    if(existingImageRef) renderImagePreview(existingImageRef);
+
     imgBox.addEventListener('click', ()=>imgInput.click());
+    chooseImageBtn.addEventListener('click', ()=>imgInput.click());
+    clearImageBtn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      imageData = null;
+      imageRemoved = true;
+      imgInput.value = '';
+      renderImagePreview(null);
+    });
+
     imgInput.addEventListener('change', async ()=>{
-      const file = imgInput.files[0];
+      const file = imgInput.files?.[0];
       if(!file) return;
-      imageData = await compressImageFile(file, 900, 0.82);
-      imgBox.innerHTML = `<img src="${imageData}">`;
+      if(!file.type.startsWith('image/')){
+        toast('Seleziona un file immagine');
+        imgInput.value = '';
+        return;
+      }
+      if(file.size > 15 * 1024 * 1024){
+        toast("La foto è troppo grande. Scegli un'immagine sotto i 15 MB.");
+        imgInput.value = '';
+        return;
+      }
+      try{
+        imageData = await compressImageFile(file, 1200, 0.84);
+        imageRemoved = false;
+        renderImagePreview(imageData);
+      }catch(err){
+        console.error('Errore caricamento foto guardaroba', err);
+        toast('Impossibile caricare questa foto');
+        imgInput.value = '';
+      }
     });
 
     const subSelect = overlay.querySelector('#gSub');
@@ -2132,7 +2175,7 @@ function openWardrobeItemModal(existing){
     overlay.querySelector('#gSaveBtn').addEventListener('click', async ()=>{
       const name = overlay.querySelector('#gName').value.trim();
       if(!name){ toast('Inserisci un nome'); return; }
-      let imageRef = existingImageRef;
+      let imageRef = imageRemoved ? null : existingImageRef;
       if(imageData){
         imageRef = imageData;
         STATE.imageCache[imageRef] = imageData;
