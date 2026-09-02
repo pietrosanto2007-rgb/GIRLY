@@ -634,6 +634,7 @@ let STATE = {
   wishlistSearch: '',
   wishlistCategory: 'all',
   wardrobeFilter: 'all',
+  wardrobeTempFilter: 'all',
   wardrobeSearch: '',
   moneyHistoryFilter: 'all',
   outfitDraft: null,
@@ -1918,6 +1919,34 @@ const WARDROBE_COLOR_HEX = {
   oro:'#d4af37', argento:'#c7ccd3', bronzo:'#a97142', rame:'#b87333', denim:'#416a93', fantasia:'linear-gradient(135deg,#e9b4c2 0 25%,#7ca9d5 25% 50%,#dfc568 50% 75%,#8ab28a 75%)'
 };
 function wardrobeColorHex(color){ return WARDROBE_COLOR_HEX[color] || 'var(--blush-100)'; }
+const AUTO_TEMP_RANGES = {
+  'T-shirt': [16,28], 'Canotta': [23,36], 'Camicia': [14,26], 'Maglia': [8,20], 'Felpa': [7,19], 'Crop top': [21,34],
+  'Jeans': [10,25], 'Pantaloni': [8,27], 'Shorts': [23,36], 'Gonna': [18,32], 'Vestito': [16,31],
+  'Giacca': [8,19], 'Cappotto': [-8,12], 'Blazer': [12,23], 'Sneakers': [8,30], 'Tacchi': [12,30],
+  'Stivali': [-5,22], 'Sandali': [22,38], 'Ballerine': [15,29], 'Borse': [-10,40], 'Cinture': [-10,40],
+  'Cappelli': [-5,35], 'Occhiali': [10,40], 'Gioielli': [-10,40]
+};
+function estimateTemperatureRange({ subcategory, material='', seasons=[], formality='' } = {}){
+  let range = [...(AUTO_TEMP_RANGES[subcategory] || [12,28])];
+  const text = String(material).toLowerCase();
+  if(/lana|cashmere|cachemire|pile|velluto|piuma|piumino/.test(text)){ range[0] -= 5; range[1] -= 2; }
+  if(/lino|cotone|viscosa|seta|satin|tulle/.test(text)){ range[0] += 2; range[1] += 3; }
+  if(/pelle|ecopelle|montone|scamosciato/.test(text)){ range[0] -= 3; range[1] -= 1; }
+  if(seasons.includes('inverno')){ range[0] -= 3; range[1] -= 1; }
+  if(seasons.includes('estate')){ range[0] += 1; range[1] += 3; }
+  if(formality==='formal' && ['Vestito','Blazer','Camicia'].includes(subcategory)) range[0] += 1;
+  return { min: Math.max(-15, Math.round(range[0])), max: Math.min(42, Math.round(range[1])) };
+}
+function itemTemperatureRange(item){
+  const estimated = estimateTemperatureRange(item);
+  const min = item?.minTemp != null ? Number(item.minTemp) : (item?.autoMinTemp != null ? Number(item.autoMinTemp) : estimated.min);
+  const max = item?.maxTemp != null ? Number(item.maxTemp) : (item?.autoMaxTemp != null ? Number(item.autoMaxTemp) : estimated.max);
+  return { min, max, automatic: item?.temperatureMode !== 'manual' && (item?.minTemp == null || item?.temperatureMode === 'auto') };
+}
+function temperatureRangeLabel(item){
+  const range = itemTemperatureRange(item);
+  return `${range.min}°–${range.max}°C${range.automatic?' · stima':''}`;
+}
 const WARDROBE_SEASONS = ['primavera','estate','autunno','inverno'];
 const WARDROBE_STYLES = ['Casual','Elegant','Sporty','Streetwear','Girly','Minimal','Trendy','Chic'];
 
@@ -1957,6 +1986,9 @@ function renderWardrobe(root){
           ${chipBtn('all', STATE.wardrobeFilter, 'Tutti')}
           ${Object.keys(WARDROBE_CATEGORIES).map(m=>chipBtn(m, STATE.wardrobeFilter, macroLabel(m))).join('')}
         </div>
+        <div class="chip-row" id="wardrobeTempFilters" style="margin:0;">
+          ${chipBtn('all', STATE.wardrobeTempFilter, 'Tutte le temperature')}${chipBtn('cold', STATE.wardrobeTempFilter, 'Freddo')}${chipBtn('mild', STATE.wardrobeTempFilter, 'Mezza stagione')}${chipBtn('hot', STATE.wardrobeTempFilter, 'Caldo')}
+        </div>
         <div class="search-wrap" style="max-width:220px;">
           ${ICONS.search}<input type="text" id="wardrobeSearch" placeholder="Cerca capo..." value="${escapeHtml(STATE.wardrobeSearch)}">
         </div>
@@ -1968,6 +2000,9 @@ function renderWardrobe(root){
   document.getElementById('btnCreateOutfitTop')?.addEventListener('click', openOutfitWizard);
   root.querySelectorAll('#wardrobeFilters .chip').forEach(c=>{
     c.addEventListener('click', ()=>{ STATE.wardrobeFilter = c.getAttribute('data-value'); renderView(); });
+  });
+  root.querySelectorAll('#wardrobeTempFilters .chip').forEach(c=>{
+    c.addEventListener('click', ()=>{ STATE.wardrobeTempFilter = c.getAttribute('data-value'); renderView(); });
   });
   document.getElementById('wardrobeSearch')?.addEventListener('input', debounce((e)=>{
     STATE.wardrobeSearch = e.target.value; renderWardrobeGrid();
@@ -1981,6 +2016,9 @@ function macroLabel(m){
 function filteredWardrobe(){
   let items = [...STATE.wardrobe];
   if(STATE.wardrobeFilter !== 'all') items = items.filter(i=>macroForSub(i.subcategory)===STATE.wardrobeFilter);
+  if(STATE.wardrobeTempFilter === 'cold') items = items.filter(i=>itemTemperatureRange(i).min <= 8);
+  if(STATE.wardrobeTempFilter === 'mild') items = items.filter(i=>itemTemperatureRange(i).min > 8 && itemTemperatureRange(i).max < 28);
+  if(STATE.wardrobeTempFilter === 'hot') items = items.filter(i=>itemTemperatureRange(i).max >= 28);
   if(STATE.wardrobeSearch.trim()){
     const q = STATE.wardrobeSearch.toLowerCase();
     items = items.filter(i=>i.name.toLowerCase().includes(q) || (i.color||'').toLowerCase().includes(q) || (i.style||'').toLowerCase().includes(q));
@@ -2018,6 +2056,7 @@ function wardrobeCardSkeleton(item){
     <div style="padding:10px 12px;">
       <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(item.name)}</div>
       <div style="font-size:11px;color:var(--ink-faint);text-transform:capitalize;">${escapeHtml(item.subcategory)} · ${escapeHtml(item.color)}</div>
+      <div style="font-size:10.5px;color:var(--rose-600);margin-top:5px;font-weight:700;">${temperatureRangeLabel(item)}</div>
     </div>
   </div>`;
 }
@@ -2031,6 +2070,7 @@ function openWardrobeItemModal(existing){
   let imageData = null; // dataURL nuova foto selezionata, persistita in Supabase
   let existingImageRef = existing?.imageData || existing?.image || null;
   let imageRemoved = false;
+  const autoTemperature = existing ? (existing.temperatureMode === 'auto' || (existing.temperatureMode == null && existing.minTemp == null && existing.maxTemp == null)) : true;
 
   openModal(`
     ${modalHead(isEdit ? 'Modifica capo' : 'Nuovo capo')}
@@ -2077,14 +2117,13 @@ function openWardrobeItemModal(existing){
       </div>
     </div>
     <div class="field-row">
-      <div class="field">
-        <label class="field-label">Temp. minima consigliata (°C)</label>
-        <input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="gMinTemp" value="${existing?.minTemp ?? ''}" placeholder="Es. 15">
-      </div>
-      <div class="field">
-        <label class="field-label">Temp. massima consigliata (°C)</label>
-        <input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="gMaxTemp" value="${existing?.maxTemp ?? ''}" placeholder="Es. 28">
-      </div>
+      <div class="field"><label class="field-label">Temp. minima consigliata (°C)</label><input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="gMinTemp" value="${autoTemperature?'':(existing?.minTemp ?? '')}" placeholder="Es. 15"></div>
+      <div class="field"><label class="field-label">Temp. massima consigliata (°C)</label><input type="number" inputmode="decimal" enterkeyhint="done" pattern="[0-9]*" id="gMaxTemp" value="${autoTemperature?'':(existing?.maxTemp ?? '')}" placeholder="Es. 28"></div>
+    </div>
+    <div class="field" style="padding:12px;border-radius:14px;background:var(--blush-50);">
+      <label style="display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600;color:var(--ink-soft);"><input type="checkbox" id="gAutoTemp" ${autoTemperature?'checked':''} style="width:18px;height:18px;accent-color:var(--rose-600);"> Stima automatica del range termico</label>
+      <div id="gTempEstimate" style="font-size:12px;color:var(--rose-700);margin-top:8px;font-weight:700;"></div>
+      <p style="font-size:11px;color:var(--ink-faint);margin-top:4px;line-height:1.4;">La stima considera categoria, materiale, stagione e formalità. Puoi disattivarla per inserire valori personalizzati.</p>
     </div>
     <div class="field">
       <label class="field-label">Formalità</label>
@@ -2162,6 +2201,25 @@ function openWardrobeItemModal(existing){
 
     const subSelect = overlay.querySelector('#gSub');
     subSelect.value = subcategory;
+    const minTempInput = overlay.querySelector('#gMinTemp');
+    const maxTempInput = overlay.querySelector('#gMaxTemp');
+    const autoTempToggle = overlay.querySelector('#gAutoTemp');
+    const tempEstimate = overlay.querySelector('#gTempEstimate');
+    const readTempContext = ()=>({ subcategory:subSelect.value, material:overlay.querySelector('#gMaterial').value, seasons:[...seasons], formality:overlay.querySelector('#gFormality').value });
+    const syncTempEstimate = ()=>{
+      const estimate = estimateTemperatureRange(readTempContext());
+      tempEstimate.textContent = `Range stimato: ${estimate.min}°–${estimate.max}°C`;
+      minTempInput.disabled = autoTempToggle.checked;
+      maxTempInput.disabled = autoTempToggle.checked;
+      if(autoTempToggle.checked){ minTempInput.value=''; maxTempInput.value=''; }
+    };
+    autoTempToggle.addEventListener('change', syncTempEstimate);
+    minTempInput.addEventListener('input', ()=>{ if(!autoTempToggle.checked) tempEstimate.textContent='Range manuale: '+(minTempInput.value||'—')+'°–'+(maxTempInput.value||'—')+'°C'; });
+    maxTempInput.addEventListener('input', ()=>{ if(!autoTempToggle.checked) tempEstimate.textContent='Range manuale: '+(minTempInput.value||'—')+'°–'+(maxTempInput.value||'—')+'°C'; });
+    overlay.querySelector('#gMaterial').addEventListener('input', syncTempEstimate);
+    overlay.querySelector('#gFormality').addEventListener('change', syncTempEstimate);
+    subSelect.addEventListener('change', syncTempEstimate);
+    syncTempEstimate();
 
     const colorBtns = overlay.querySelectorAll('.color-opt');
     colorBtns.forEach(b=>b.addEventListener('click', ()=>{ color=b.getAttribute('data-v'); colorBtns.forEach(x=>x.classList.toggle('active',x===b)); }));
@@ -2178,6 +2236,7 @@ function openWardrobeItemModal(existing){
       b.classList.toggle('active');
     }));
     seasonBtns.forEach(b=>b.classList.toggle('active', seasons.includes(b.getAttribute('data-v'))));
+    seasonBtns.forEach(b=>b.addEventListener('click', ()=>setTimeout(syncTempEstimate, 0)));
 
     overlay.querySelector('#gDeleteBtn')?.addEventListener('click', ()=>{
       closeModal();
@@ -2199,8 +2258,10 @@ function openWardrobeItemModal(existing){
       }
       const data = {
         name, subcategory: subSelect.value, color, style, season: seasons,
-        minTemp: overlay.querySelector('#gMinTemp').value ? parseFloat(overlay.querySelector('#gMinTemp').value) : null,
-        maxTemp: overlay.querySelector('#gMaxTemp').value ? parseFloat(overlay.querySelector('#gMaxTemp').value) : null,
+        minTemp: autoTempToggle.checked ? null : (overlay.querySelector('#gMinTemp').value ? parseFloat(overlay.querySelector('#gMinTemp').value) : null),
+        maxTemp: autoTempToggle.checked ? null : (overlay.querySelector('#gMaxTemp').value ? parseFloat(overlay.querySelector('#gMaxTemp').value) : null),
+        temperatureMode: autoTempToggle.checked ? 'auto' : 'manual',
+        ...(autoTempToggle.checked ? (()=>{ const r=estimateTemperatureRange(readTempContext()); return {autoMinTemp:r.min, autoMaxTemp:r.max}; })() : {}),
         formality: overlay.querySelector('#gFormality').value,
         material: overlay.querySelector('#gMaterial').value.trim(),
         notes: overlay.querySelector('#gNotes').value.trim(),
@@ -2363,9 +2424,9 @@ function colorCompat(c1, c2){
 }
 
 function itemMatchesWeather(item, weather, band){
-  if(item.minTemp != null && weather.temp < item.minTemp) return false;
-  if(item.maxTemp != null && weather.temp > item.maxTemp) return false;
-  if(band.avoid.includes(item.subcategory) && item.minTemp == null && item.maxTemp == null) return false;
+  const range = itemTemperatureRange(item);
+  if(weather.temp < range.min || weather.temp > range.max) return false;
+  if(band.avoid.includes(item.subcategory) && item.temperatureMode === 'manual' && item.minTemp == null && item.maxTemp == null) return false;
   return true;
 }
 function itemMatchesRain(item, weather){
@@ -2646,12 +2707,14 @@ async function runOutfitGeneration(){
   renderOutfitResultModal();
 }
 
+function outfitRoleLabel(role){ return ({top:'Top',bottom:'Bottom',dress:'Vestito',outerwear:'Capospalla',shoes:'Scarpe',bag:'Borsa',accessory:'Accessorio'})[role] || role; }
 function pieceImgTag(item, cacheBust){
   if(!item) return '';
-  return `<div class="outfit-piece" data-role="${item.__role||''}" style="text-align:center;">
-    <div class="outfit-piece-img" data-imgfor="${item.id}" style="width:100%;aspect-ratio:1;border-radius:16px;background:var(--blush-50);display:flex;align-items:center;justify-content:center;color:var(--blush-300);overflow:hidden;margin-bottom:6px;">${ICONS.image}</div>
-    <div style="font-size:11.5px;font-weight:600;">${escapeHtml(item.name)}</div>
-  </div>`;
+  const role = item.__role || '';
+  return `<article class="outfit-piece" data-role="${role}">
+    <div class="outfit-piece-img" data-imgfor="${item.id}">${ICONS.image}</div>
+    <div class="outfit-piece-copy"><span class="badge badge-neutral">${outfitRoleLabel(role)}</span><div class="outfit-piece-name">${escapeHtml(item.name)}</div><div class="outfit-piece-meta">${escapeHtml(item.color||'')} · ${temperatureRangeLabel(item)}</div></div>
+  </article>`;
 }
 
 function renderOutfitResultModal(){
@@ -2674,9 +2737,15 @@ function renderOutfitResultModal(){
     <div class="chip-row" id="outfitTabs">
       ${STATE.outfitCandidates.map((c,i)=>`<button class="chip ${i===STATE.outfitSelectedIndex?'active':''}" data-i="${i}">Outfit ${i+1}${i===0?' ★':''}</button>`).join('')}
     </div>
-    <div id="outfitPiecesGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
-      ${pieces.map(p=>pieceImgTag(p)).join('')}
-    </div>
+    <style>
+      .outfit-pinterest-grid{column-count:2;column-gap:12px;margin-bottom:16px;}
+      .outfit-pinterest-grid .outfit-piece{break-inside:avoid;margin:0 0 12px;background:var(--white);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-1);}
+      .outfit-pinterest-grid .outfit-piece-img{width:100%;min-height:150px;aspect-ratio:4/5;background:var(--blush-50);display:flex;align-items:center;justify-content:center;color:var(--blush-300);overflow:hidden;}
+      .outfit-pinterest-grid .outfit-piece-img img{width:100%;height:100%;object-fit:cover;}
+      .outfit-piece-copy{padding:10px 11px 12px;text-align:left;}.outfit-piece-copy .badge{font-size:9px;padding:3px 7px;}.outfit-piece-name{font-size:12.5px;font-weight:700;margin-top:6px;}.outfit-piece-meta{font-size:10.5px;color:var(--ink-faint);margin-top:4px;text-transform:capitalize;}
+      @media(max-width:480px){.outfit-pinterest-grid{column-count:1;}}
+    </style>
+    <div id="outfitPiecesGrid" class="outfit-pinterest-grid">${pieces.map(p=>pieceImgTag(p)).join('')}</div>
     <div class="card" style="background:var(--blush-50);border:none;padding:16px;margin-bottom:16px;">
       <div style="font-size:12px;font-weight:700;color:var(--rose-700);margin-bottom:4px;">Perché questo outfit?</div>
       <div style="font-size:13px;color:var(--ink-soft);line-height:1.5;">${outfitExplanation(combo, weather, occasion)}</div>
@@ -2823,6 +2892,11 @@ function saveCurrentOutfit(combo, weather, occasion, silent){
 }
 
 /* ============================ OUTFIT SALVATI ============================ */
+function savedOutfitMosaic(outfit){
+  const items = (outfit.items||[]).slice(0,4).map(saved=>STATE.wardrobe.find(item=>item.id===saved.itemId)).filter(Boolean);
+  if(!items.length) return `<div class="saved-outfit-mosaic-empty">${ICONS.outfits}</div>`;
+  return `<div class="saved-outfit-mosaic">${items.map(item=>{ const src=item.imageData||item.image; return `<div class="saved-outfit-tile" style="background:${wardrobeColorHex(item.color||'beige')};">${src?`<img src="${escapeHtml(src)}" alt="${escapeHtml(item.name)}">`:`<span>${escapeHtml((item.name||'?').slice(0,1).toUpperCase())}</span>`}</div>`; }).join('')}</div>`;
+}
 function getFilteredSavedOutfits(){
   let list = [...STATE.outfits];
   if(STATE.outfitFilter === 'favorites') list = list.filter(o=>o.favorite);
@@ -2852,11 +2926,18 @@ function renderSavedOutfits(root){
         <div class="chip-row" id="outfitFilters" style="margin:0;">${chipBtn('all',STATE.outfitFilter,'Tutti')} ${chipBtn('favorites',STATE.outfitFilter,'Preferiti')} ${chipBtn('worn',STATE.outfitFilter,'Indossati')}</div>
       </div>
       ${outfits.length===0 ? `<div class="card empty-state" style="padding:44px 20px;"><div class="empty-icon">${ICONS.search}</div><div class="empty-title" style="font-size:16px;">Nessun risultato</div><p class="empty-sub">Prova a cambiare ricerca o filtro.</p></div>` : `
+      <style>
+        .saved-outfit-mosaic{display:grid;grid-template-columns:repeat(2,1fr);grid-auto-rows:120px;gap:3px;background:var(--blush-100);}
+        .saved-outfit-tile{overflow:hidden;display:flex;align-items:center;justify-content:center;color:rgba(43,36,38,.48);font-family:var(--font-display);font-size:28px;}
+        .saved-outfit-tile:first-child{grid-row:span 2;}.saved-outfit-tile img{width:100%;height:100%;object-fit:cover;}.saved-outfit-mosaic-empty{height:120px;display:flex;align-items:center;justify-content:center;background:var(--blush-100);color:var(--rose-500);}.saved-outfit-mosaic-empty svg{width:34px;height:34px;}
+        @media(max-width:560px){.saved-outfit-mosaic{grid-auto-rows:105px;}}
+      </style>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;">
-        ${outfits.map(o=>`<div class="card outfit-saved-card" data-id="${o.id}" style="cursor:pointer;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><div style="font-size:14px;font-weight:600;">${escapeHtml(o.name)}</div><div style="font-size:11.5px;color:var(--ink-faint);margin-top:2px;">${fmtDate(o.createdAt)}</div></div><button class="icon-btn fav-btn" data-id="${o.id}" style="width:32px;height:32px;color:${o.favorite?'var(--rose-600)':'var(--ink-faint)'};">${o.favorite?ICONS.heartFill:ICONS.heart}</button></div>
+        ${outfits.map(o=>`<div class="card outfit-saved-card" data-id="${o.id}" style="cursor:pointer;padding:0;overflow:hidden;">
+          ${savedOutfitMosaic(o)}
+          <div style="padding:14px 16px 16px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><div style="font-size:14px;font-weight:600;">${escapeHtml(o.name)}</div><div style="font-size:11.5px;color:var(--ink-faint);margin-top:2px;">${fmtDate(o.createdAt)}</div></div><button class="icon-btn fav-btn" data-id="${o.id}" style="width:32px;height:32px;color:${o.favorite?'var(--rose-600)':'var(--ink-faint)'};">${o.favorite?ICONS.heartFill:ICONS.heart}</button></div>
           <div style="margin-top:10px;font-size:12.5px;color:var(--ink-soft);">${(o.items||[]).map(i=>escapeHtml(i.name)).join(' + ')}</div>
-          <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;"><span class="badge badge-neutral">${o.temperature}°C</span><span class="badge badge-neutral">${escapeHtml(o.occasion)}</span>${Number(o.wornCount||0)>0?`<span class="badge badge-success">Indossato ${o.wornCount}×</span>`:''}</div>
+          <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;"><span class="badge badge-neutral">${o.temperature}°C</span><span class="badge badge-neutral">${escapeHtml(o.occasion)}</span>${Number(o.wornCount||0)>0?`<span class="badge badge-success">Indossato ${o.wornCount}×</span>`:''}</div></div>
         </div>`).join('')}
       </div>`}
     `}
