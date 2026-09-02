@@ -2026,7 +2026,7 @@ function openWardrobeItemModal(existing){
         <button type="button" class="btn btn-secondary btn-sm" id="gChooseImageBtn" style="flex:1;">${ICONS.image} Scegli foto</button>
         <button type="button" class="btn btn-ghost btn-sm" id="gClearImageBtn" style="display:none;">${ICONS.trash} Rimuovi</button>
       </div>
-      <input type="file" id="gImageInput" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif" capture="environment" style="display:none;">
+      <input type="file" id="gImageInput" accept="image/*" aria-label="Scegli una foto dal telefono" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
     </div>
     <div class="field">
       <label class="field-label">Nome</label>
