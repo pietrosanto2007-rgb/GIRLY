@@ -1168,6 +1168,7 @@ function folderCardHtml(c){
     </div>
     <div style="margin-top:14px;font-size:13.5px;font-weight:600;color:var(--ink-soft);">${escapeHtml(c.name)}</div>
     <div style="font-family:var(--font-display);font-size:21px;font-weight:600;margin-top:2px;">${euro(c.amount)}</div>
+    ${Number(c.budget)>0 ? `<div style="margin-top:10px;height:6px;border-radius:6px;background:var(--blush-100);overflow:hidden;"><div style="height:100%;width:${Math.min(100,Math.round((c.amount/c.budget)*100))}%;background:${c.amount>=c.budget?'var(--success)':'var(--rose-500)'};"></div></div><div style="font-size:10.5px;color:var(--ink-faint);margin-top:4px;">Obiettivo ${euro(c.budget)}</div>` : ''}
   </div>`;
 }
 
@@ -1302,6 +1303,10 @@ function openFolderModal(existing){
       <input type="text" id="folderDesc" value="${escapeHtml(existing?.description||'')}" placeholder="A cosa serve questa cartella">
     </div>
     <div class="field">
+      <label class="field-label">Budget obiettivo (opzionale)</label>
+      <input type="number" inputmode="decimal" id="folderBudget" value="${existing?.budget||''}" placeholder="Es. 500" step="0.01" min="0">
+    </div>
+    <div class="field">
       <label class="field-label">Icona</label>
       <div class="opt-grid" id="folderIcons">
         ${FOLDER_ICONS.map(i=>`<button type="button" class="opt-btn icon-opt" data-v="${i}" style="display:flex;align-items:center;justify-content:center;padding:12px;">${ICONS[i]}</button>`).join('')}
@@ -1349,7 +1354,7 @@ function openFolderModal(existing){
       const desc = overlay.querySelector('#folderDesc').value.trim();
       if(!name){ toast('Dai un nome alla cartella'); return; }
       if(isEdit){
-        existing.name = name; existing.description = desc; existing.icon = selIcon; existing.color = selColor;
+        existing.name = name; existing.description = desc; existing.budget = parseFloat(overlay.querySelector('#folderBudget')?.value) || null; existing.icon = selIcon; existing.color = selColor;
         saveMoney();
         toast('Cartella aggiornata');
         closeModal();
@@ -1358,7 +1363,7 @@ function openFolderModal(existing){
         const initialRaw = overlay.querySelector('#folderInitial')?.value;
         let initial = parseFloat(initialRaw) || 0;
         if(initial > moneyUnallocated()) initial = moneyUnallocated();
-        const cat = { id:uid('cat'), name, description:desc, icon:selIcon, color:selColor, amount:initial, createdAt:todayISO() };
+        const cat = { id:uid('cat'), name, description:desc, budget:parseFloat(overlay.querySelector('#folderBudget')?.value) || null, icon:selIcon, color:selColor, amount:initial, createdAt:todayISO() };
         STATE.money.categories.push(cat);
         STATE.money.unallocated -= initial;
         recalcTotal();
@@ -1679,6 +1684,7 @@ function renderWishlist(root){
         ${chipBtn('all', STATE.wishlistFilter, 'Tutte')}
         ${chipBtn('unpurchased', STATE.wishlistFilter, 'Non acquistati')}
         ${chipBtn('purchased', STATE.wishlistFilter, 'Acquistati')}
+        ${chipBtn('high', STATE.wishlistFilter, 'Alta priorità')}
       </div>
 
       <div id="wishlistContent"></div>
@@ -1706,6 +1712,7 @@ function filteredWishlist(){
   let items = [...STATE.wishlist];
   if(STATE.wishlistFilter === 'purchased') items = items.filter(i=>i.purchased);
   if(STATE.wishlistFilter === 'unpurchased') items = items.filter(i=>!i.purchased);
+  if(STATE.wishlistFilter === 'high') items = items.filter(i=>i.priority==='Alta');
   if(STATE.wishlistSearch.trim()){
     const q = STATE.wishlistSearch.toLowerCase();
     items = items.filter(i=>i.name.toLowerCase().includes(q) || (i.category||'').toLowerCase().includes(q) || (i.notes||'').toLowerCase().includes(q));
@@ -2951,6 +2958,18 @@ async function renderHome(root){
     </div>
     <style>@media(max-width:900px){.home-grid{grid-template-columns:1fr 1fr !important;}}@media(max-width:560px){.home-grid{grid-template-columns:1fr !important;}}</style>
 
+    <div class="card" style="margin-bottom:18px;padding:16px 18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;"><div class="section-title" style="margin:0;font-size:15px;">Panoramica personale</div><span style="font-size:11.5px;color:var(--ink-faint);">Dati sincronizzati</span></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+        <div style="padding:11px;border-radius:12px;background:var(--cream);"><div style="font-size:11px;color:var(--ink-faint);">Capi</div><strong style="font-size:20px;font-family:var(--font-display);">${STATE.wardrobe.length}</strong></div>
+        <div style="padding:11px;border-radius:12px;background:var(--cream);"><div style="font-size:11px;color:var(--ink-faint);">Outfit</div><strong style="font-size:20px;font-family:var(--font-display);">${STATE.outfits.length}</strong></div>
+        <div style="padding:11px;border-radius:12px;background:var(--cream);"><div style="font-size:11px;color:var(--ink-faint);">Preferiti</div><strong style="font-size:20px;font-family:var(--font-display);">${STATE.outfits.filter(o=>o.favorite).length}</strong></div>
+        <div style="padding:11px;border-radius:12px;background:var(--cream);"><div style="font-size:11px;color:var(--ink-faint);">Da comprare</div><strong style="font-size:20px;font-family:var(--font-display);">${STATE.wishlist.filter(i=>!i.purchased).length}</strong></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;"><button class="btn btn-primary btn-sm" id="quickWardrobe">${ICONS.plus} Aggiungi capo</button><button class="btn btn-secondary btn-sm" id="quickOutfit">${ICONS.sparkle} Crea outfit</button><button class="btn btn-secondary btn-sm" id="quickWish">${ICONS.wishlist} Nuovo desiderio</button><button class="btn btn-secondary btn-sm" id="quickMoney">${ICONS.money} Registra movimento</button></div>
+    </div>
+    <style>@media(max-width:620px){#viewRoot .card > div[style*="repeat(4"]{grid-template-columns:1fr 1fr !important;}}</style>
+
     <div class="card" style="margin-bottom:26px;background:linear-gradient(155deg,var(--blush-100),var(--blush-50));border:none;" id="outfitOfDayCard">
       <div id="outfitOfDaySlot">${skeletonOutfitCard()}</div>
     </div>
@@ -2974,6 +2993,10 @@ async function renderHome(root){
     <style>@media(max-width:800px){.home-lists-grid{grid-template-columns:1fr !important;}}</style>
   `;
 
+  document.getElementById('quickWardrobe')?.addEventListener('click', openWardrobeItemModal);
+  document.getElementById('quickOutfit')?.addEventListener('click', openOutfitWizard);
+  document.getElementById('quickWish')?.addEventListener('click', openWishlistItemModal);
+  document.getElementById('quickMoney')?.addEventListener('click', openAddTransactionModal);
   document.getElementById('goMoney').addEventListener('click', ()=>navigate('money'));
   document.getElementById('goWishlist').addEventListener('click', ()=>navigate('wishlist'));
   document.getElementById('goWeather').addEventListener('click', ()=>navigate('wardrobe'));
@@ -3217,6 +3240,7 @@ function exportAllData(){
   const payload = {
     profile: STATE.profile, money: STATE.money, wishlist: STATE.wishlist,
     wardrobe: STATE.wardrobe, outfits: STATE.outfits, settings: STATE.settings,
+    todayOutfit: STATE.todayOutfit || null,
     exportedAt: todayISO(), appName: getAppName(),
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
@@ -3239,7 +3263,8 @@ function handleImportFile(e){
       if(data.wishlist) STATE.wishlist = data.wishlist;
       if(data.wardrobe) STATE.wardrobe = data.wardrobe;
       if(data.outfits) STATE.outfits = data.outfits;
-      if(data.settings) STATE.settings = data.settings;
+      if(data.settings) STATE.settings = { ...defaultSettings(), ...data.settings };
+      if(Object.prototype.hasOwnProperty.call(data,'todayOutfit')) STATE.todayOutfit = data.todayOutfit;
       await queueStateSave('import');
       toast('Dati importati con successo ✨');
       renderShell(); navigate('home');
